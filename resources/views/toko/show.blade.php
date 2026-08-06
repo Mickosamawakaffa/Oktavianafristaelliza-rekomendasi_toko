@@ -142,44 +142,27 @@
 
         </div>
 
-        <!-- Kolom Kanan: Peta Lokasi Google Maps (1/3 width) -->
+        <!-- Kolom Kanan: Peta Lokasi (OpenStreetMap) -->
         <div class="space-y-6">
-            
+
             <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs">
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-map-location-dot text-rose-500"></i>
-                        Lokasi Google Maps
+                        <i class="fa-solid fa-map-location-dot text-emerald-500"></i>
+                        Lokasi Toko
                     </h3>
-                    <span class="text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-800 font-semibold rounded border border-emerald-200">
-                        Google Maps API
+                    <span class="text-[10px] px-2 py-0.5 bg-emerald-100 text-emerald-800 font-semibold rounded border border-emerald-200 flex items-center gap-1">
+                        <i class="fa-solid fa-map text-emerald-600"></i> OpenStreetMap
                     </span>
                 </div>
 
-                @php
-                    $apiKey = config('services.google_maps.key') ?? env('GOOGLE_MAPS_API_KEY');
-                    $isRealKey = !empty($apiKey) && $apiKey !== 'YOUR_GOOGLE_MAPS_API_KEY';
-                @endphp
-
-                @if(!$isRealKey)
-                    {{-- Alert jika API Key belum diisi --}}
-                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 mb-4 text-amber-800 text-xs">
-                        <p class="font-bold flex items-center gap-1.5 mb-1">
-                            <i class="fa-solid fa-key"></i> Kunci API Google Maps
-                        </p>
-                        <p class="leading-relaxed">
-                            Tempelkan API Key kamu di <code class="bg-amber-100 px-1 py-0.5 rounded font-mono text-[11px]">.env</code> pada variabel <code class="bg-amber-100 px-1 py-0.5 rounded font-mono text-[11px]">GOOGLE_MAPS_API_KEY</code>.
-                        </p>
-                    </div>
-                @endif
-
-                <!-- Google Maps Container -->
-                <div id="google-map" class="w-full h-80 rounded-xl border border-slate-300 overflow-hidden shadow-inner"></div>
+                <!-- Leaflet Map Container -->
+                <div id="osm-map" class="w-full h-80 rounded-xl border border-slate-300 overflow-hidden shadow-inner"></div>
 
                 <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center text-xs">
                     <span class="text-slate-500 font-mono text-[11px]">{{ $toko->latitude }}, {{ $toko->longitude }}</span>
-                    <a href="https://www.google.com/maps/search/?api=1&query={{ $toko->latitude }},{{ $toko->longitude }}" target="_blank" class="text-emerald-600 hover:text-emerald-700 font-semibold flex items-center gap-1">
-                        <span>Buka Rute</span>
+                    <a href="https://www.openstreetmap.org/?mlat={{ $toko->latitude }}&mlon={{ $toko->longitude }}&zoom=17" target="_blank" class="text-emerald-600 hover:text-emerald-700 font-semibold flex items-center gap-1">
+                        <span>Buka di OSM</span>
                         <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                     </a>
                 </div>
@@ -193,76 +176,31 @@
 
 @push('scripts')
 <script>
-    const lat = {{ $toko->latitude ?? -8.1695 }};
-    const lng = {{ $toko->longitude ?? 113.7152 }};
-    const storeName = "{{ $toko->nama }}";
-    const storeAddress = "{{ $toko->alamat }}";
+    (function () {
+        const lat = {{ $toko->latitude ?? -8.1695 }};
+        const lng = {{ $toko->longitude ?? 113.7152 }};
+        const storeName = "{{ addslashes($toko->nama) }}";
+        const storeAddress = "{{ addslashes($toko->alamat) }}";
 
-    function initGoogleMap() {
-        const tokoLocation = { lat: lat, lng: lng };
+        const map = L.map('osm-map').setView([lat, lng], 16);
 
-        const map = new google.maps.Map(document.getElementById("google-map"), {
-            zoom: 16,
-            center: tokoLocation,
-            mapTypeId: 'roadmap',
-            zoomControl: true,
-            streetViewControl: true,
-            mapTypeControl: false,
-        });
-
-        const infoWindow = new google.maps.InfoWindow({
-            content: `
-                <div style="padding: 6px; font-family: sans-serif;">
-                    <h4 style="margin: 0 0 4px 0; font-weight: bold; font-size: 14px; color: #0f172a;">${storeName}</h4>
-                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #475569;">${storeAddress}</p>
-                    <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}" target="_blank" style="font-size: 11px; color: #16a34a; font-weight: bold; text-decoration: none;">
-                        Petunjuk Arah &rarr;
-                    </a>
-                </div>
-            `
-        });
-
-        const marker = new google.maps.Marker({
-            position: tokoLocation,
-            map: map,
-            title: storeName,
-            animation: google.maps.Animation.DROP,
-        });
-
-        marker.addListener("click", () => {
-            infoWindow.open(map, marker);
-        });
-
-        // Buka info window secara otomatis
-        infoWindow.open(map, marker);
-    }
-
-    function initFallbackLeafletMap() {
-        const map = L.map('google-map').setView([lat, lng], 16);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
         }).addTo(map);
 
         const marker = L.marker([lat, lng]).addTo(map);
-        marker.bindPopup(`<b>${storeName}</b><br>${storeAddress}`).openPopup();
-    }
+        marker.bindPopup(
+            `<div style="min-width:160px; font-family:sans-serif;">
+                <b style="font-size:13px; color:#0f172a;">${storeName}</b><br>
+                <span style="font-size:11px; color:#475569;">${storeAddress}</span><br><br>
+                <a href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=17"
+                   target="_blank"
+                   style="font-size:11px; color:#16a34a; font-weight:bold; text-decoration:none;">
+                    Buka di OpenStreetMap &rarr;
+                </a>
+            </div>`
+        ).openPopup();
+    })();
 </script>
-
-@php
-    $apiKey = config('services.google_maps.key') ?? env('GOOGLE_MAPS_API_KEY');
-    $isRealKey = !empty($apiKey) && $apiKey !== 'YOUR_GOOGLE_MAPS_API_KEY';
-@endphp
-
-@if($isRealKey)
-    {{-- Muat Google Maps JS API jika key valid --}}
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ $apiKey }}&callback=initGoogleMap" async defer></script>
-@else
-    {{-- Fallback ke OpenStreetMap / Leaflet jika key belum diisi --}}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            initFallbackLeafletMap();
-        });
-    </script>
-@endif
 @endpush

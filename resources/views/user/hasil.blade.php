@@ -69,7 +69,7 @@
         </div>
     </div>
 
-    {{-- Interactive Google Map of All Recommended Stores --}}
+    {{-- Peta Persebaran Toko (OpenStreetMap + Leaflet) --}}
     <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs mb-8">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
             <div>
@@ -79,25 +79,13 @@
                 </h2>
                 <p class="text-xs text-slate-500">Marker biru melambangkan posisi Kamu. Marker bernomor menunjukkan peringkat rekomendasi toko.</p>
             </div>
-            <span class="text-[10px] font-bold px-2.5 py-1 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
-                Google Maps API Integrated
+            <span class="text-[10px] font-bold px-2.5 py-1 rounded bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1.5">
+                <i class="fa-solid fa-map text-emerald-600"></i> OpenStreetMap
             </span>
         </div>
 
-        @php
-            $apiKey = config('services.google_maps.key') ?? env('GOOGLE_MAPS_API_KEY');
-            $isRealKey = !empty($apiKey) && $apiKey !== 'YOUR_GOOGLE_MAPS_API_KEY';
-        @endphp
-
-        @if(!$isRealKey)
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-amber-800 text-xs">
-                <i class="fa-solid fa-key mr-1"></i>
-                API Key Google Maps belum diisi di <code class="bg-amber-100 px-1 py-0.5 rounded">.env</code> pada variabel <code class="bg-amber-100 px-1 py-0.5 rounded">GOOGLE_MAPS_API_KEY</code>.
-            </div>
-        @endif
-
         {{-- Map container --}}
-        <div id="google-map-hasil" class="w-full h-80 sm:h-96 rounded-xl border border-slate-300 shadow-inner overflow-hidden"></div>
+        <div id="osm-map-hasil" class="w-full h-80 sm:h-96 rounded-xl border border-slate-300 shadow-inner overflow-hidden"></div>
     </div>
 
     {{-- Rankings List --}}
@@ -230,6 +218,7 @@
 
 @push('scripts')
 <script>
+(function () {
     const userPos = { lat: {{ $userLat }}, lng: {{ $userLng }} };
 
     const storesData = [
@@ -249,117 +238,83 @@
         @endforeach
     ];
 
-    function initGoogleMapHasil() {
-        if (storesData.length === 0) return;
+    if (storesData.length === 0) return;
 
-        const bounds = new google.maps.LatLngBounds();
-        bounds.extend(userPos);
+    // Inisialisasi peta di tengah posisi user
+    const map = L.map('osm-map-hasil').setView([userPos.lat, userPos.lng], 14);
 
-        const map = new google.maps.Map(document.getElementById("google-map-hasil"), {
-            zoom: 14,
-            center: userPos,
-            mapTypeId: 'roadmap',
-            mapTypeControl: false,
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // ── Marker Biru: Posisi User ───────────────────────────────────
+    const userIcon = L.divIcon({
+        className: '',
+        html: `<div style="
+            width:20px; height:20px; border-radius:50%;
+            background:#0284c7; border:3px solid #fff;
+            box-shadow:0 2px 6px rgba(0,0,0,0.4);
+        "></div>`,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+    });
+
+    L.marker([userPos.lat, userPos.lng], { icon: userIcon })
+        .addTo(map)
+        .bindPopup(`<div style="font-family:sans-serif; min-width:130px;">
+            <strong style="color:#0284c7;">📍 Posisi Anda</strong><br>
+            <span style="font-size:11px; color:#475569;">Lat: ${userPos.lat}<br>Lng: ${userPos.lng}</span>
+        </div>`);
+
+    const bounds = [[userPos.lat, userPos.lng]];
+
+    // ── Marker Bernomor: Toko Rekomendasi ──────────────────────────
+    // Warna berdasarkan peringkat
+    const rankColors = ['#f59e0b', '#94a3b8', '#ea580c'];
+
+    storesData.forEach(store => {
+        const bgColor = rankColors[store.rank - 1] ?? '#0f172a';
+
+        const tokoIcon = L.divIcon({
+            className: '',
+            html: `<div style="
+                width:30px; height:30px; border-radius:50%;
+                background:${bgColor}; border:3px solid #fff;
+                box-shadow:0 2px 8px rgba(0,0,0,0.35);
+                display:flex; align-items:center; justify-content:center;
+                font-weight:800; font-size:13px; color:#fff;
+                font-family:sans-serif;
+            ">${store.rank}</div>`,
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
         });
 
-        const infoWindow = new google.maps.InfoWindow();
-
-        // Marker Posisi User (Biru)
-        const userMarker = new google.maps.Marker({
-            position: userPos,
-            map: map,
-            title: "Posisi Lokasi Anda Saat Ini",
-            icon: {
-                url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-            }
-        });
-
-        userMarker.addListener("click", () => {
-            infoWindow.setContent(`
-                <div style="padding: 6px; font-family: sans-serif;">
-                    <strong style="color: #0284c7; font-size: 13px;">📍 Posisi Anda Saat Ini</strong>
-                    <p style="margin: 4px 0 0 0; font-size: 11px; color: #475569;">Lat: ${userPos.lat}, Lng: ${userPos.lng}</p>
+        L.marker([store.lat, store.lng], { icon: tokoIcon })
+            .addTo(map)
+            .bindPopup(`<div style="font-family:sans-serif; min-width:200px; max-width:240px;">
+                <div style="margin-bottom:6px;">
+                    <span style="background:${bgColor}; color:#fff; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:700;">
+                        Peringkat #${store.rank}
+                    </span>
+                    <span style="background:#dcfce7; color:#166534; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:700; margin-left:4px;">
+                        ${store.jarak} km
+                    </span>
                 </div>
-            `);
-            infoWindow.open(map, userMarker);
-        });
+                <b style="font-size:13px; color:#0f172a;">${store.nama}</b><br>
+                <span style="font-size:11px; color:#64748b;">Skor SMART: <strong>${store.score}</strong></span><br>
+                <span style="font-size:11px; color:#475569;">${store.alamat}</span><br><br>
+                <a href="/toko/${store.id}"
+                   style="font-size:11px; color:#0284c7; font-weight:700; text-decoration:none;">
+                    Lihat Detail Toko &rarr;
+                </a>
+            </div>`);
 
-        // Marker Toko Rekomendasi
-        storesData.forEach(store => {
-            const pos = { lat: store.lat, lng: store.lng };
-            bounds.extend(pos);
+        bounds.push([store.lat, store.lng]);
+    });
 
-            const marker = new google.maps.Marker({
-                position: pos,
-                map: map,
-                title: `#${store.rank} - ${store.nama}`,
-                label: {
-                    text: `${store.rank}`,
-                    color: "#ffffff",
-                    fontWeight: "bold",
-                    fontSize: "12px"
-                }
-            });
-
-            marker.addListener("click", () => {
-                infoWindow.setContent(`
-                    <div style="padding: 6px; font-family: sans-serif; max-width: 210px;">
-                        <span style="background: #16a34a; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;">
-                            Peringkat #${store.rank}
-                        </span>
-                        <span style="background: #dcfce7; color: #166534; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; margin-left: 4px;">
-                            ${store.jarak} km
-                        </span>
-                        <h4 style="margin: 6px 0 2px 0; font-weight: bold; font-size: 13px; color: #0f172a;">${store.nama}</h4>
-                        <p style="margin: 0 0 6px 0; font-size: 11px; color: #64748b;">Skor SMART: <strong>${store.score}</strong></p>
-                        <p style="margin: 0 0 8px 0; font-size: 11px; color: #475569;">${store.alamat}</p>
-                        <a href="/toko/${store.id}" style="font-size: 11px; color: #0284c7; font-weight: bold; text-decoration: none;">
-                            Lihat Detail Toko &rarr;
-                        </a>
-                    </div>
-                `);
-                infoWindow.open(map, marker);
-            });
-        });
-
-        map.fitBounds(bounds);
-    }
-
-    function initFallbackLeafletHasil() {
-        if (storesData.length === 0) return;
-
-        const map = L.map('google-map-hasil').setView([userPos.lat, userPos.lng], 14);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        const group = [[userPos.lat, userPos.lng]];
-        L.marker([userPos.lat, userPos.lng]).addTo(map).bindPopup("<b>📍 Posisi Anda</b>");
-
-        storesData.forEach(store => {
-            const marker = L.marker([store.lat, store.lng]).addTo(map);
-            marker.bindPopup(`<b>Rank #${store.rank}: ${store.nama}</b><br>Jarak: ${store.jarak} km<br>Skor: ${store.score}<br>${store.alamat}`);
-            group.push([store.lat, store.lng]);
-        });
-
-        map.fitBounds(group);
-    }
+    // Sesuaikan zoom agar semua marker terlihat
+    map.fitBounds(bounds, { padding: [30, 30] });
+})();
 </script>
-
-@php
-    $apiKey = config('services.google_maps.key') ?? env('GOOGLE_MAPS_API_KEY');
-    $isRealKey = !empty($apiKey) && $apiKey !== 'YOUR_GOOGLE_MAPS_API_KEY';
-@endphp
-
-@if($isRealKey)
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ $apiKey }}&callback=initGoogleMapHasil" async defer></script>
-@else
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            initFallbackLeafletHasil();
-        });
-    </script>
-@endif
 @endpush
