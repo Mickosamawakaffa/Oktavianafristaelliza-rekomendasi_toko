@@ -126,22 +126,44 @@
                                 @endphp
                                 <li
                                     data-id="{{ $k->id }}"
-                                    class="sortable-item flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/30 cursor-grab active:cursor-grabbing transition-all select-none group"
+                                    class="sortable-item flex items-center gap-3 p-3.5 rounded-xl border border-slate-200 bg-white hover:border-emerald-300 hover:bg-emerald-50/30 cursor-grab active:cursor-grabbing select-none group transition-colors shadow-2xs"
                                 >
-                                    <div class="rank-badge w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-extrabold shrink-0 group-hover:bg-emerald-600 transition-colors">
-                                        {{ $index + 1 }}
+                                    <div class="drag-handle flex items-center gap-2.5">
+                                        <div class="rank-badge w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-extrabold shrink-0 group-hover:bg-emerald-600 transition-colors">
+                                            {{ $index + 1 }}
+                                        </div>
+
+                                        <i class="fa-solid fa-grip-vertical text-slate-300 group-hover:text-emerald-500 transition-colors text-base shrink-0"></i>
                                     </div>
 
-                                    <i class="fa-solid fa-grip-vertical text-slate-300 group-hover:text-emerald-400 transition-colors shrink-0"></i>
-
-                                    <div class="flex-1 min-w-0">
+                                    <div class="flex-1 min-w-0 drag-handle">
                                         <span class="text-sm font-bold text-slate-800">{{ $k->nama_kriteria }}</span>
                                     </div>
 
-                                    <span class="text-[10px] font-bold px-2 py-1 rounded-lg {{ $colors['bg'] }} {{ $colors['text'] }} border {{ $colors['border'] }} flex items-center gap-1 shrink-0">
+                                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg {{ $colors['bg'] }} {{ $colors['text'] }} border {{ $colors['border'] }} flex items-center gap-1 shrink-0">
                                         <i class="fa-solid {{ $colors['icon'] }} text-[9px]"></i>
                                         {{ ucfirst($k->jenis) }}
                                     </span>
+
+                                    {{-- Tombol Fallback Naik / Turun --}}
+                                    <div class="flex flex-col gap-0.5 shrink-0 pl-1 border-l border-slate-100">
+                                        <button
+                                            type="button"
+                                            onclick="moveItemUp(this)"
+                                            class="btn-move-up w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:bg-emerald-100/60 disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:text-slate-400 transition"
+                                            title="Geser Naik"
+                                        >
+                                            <i class="fa-solid fa-chevron-up text-[10px]"></i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onclick="moveItemDown(this)"
+                                            class="btn-move-down w-6 h-6 rounded flex items-center justify-center text-slate-400 hover:text-emerald-600 hover:bg-emerald-100/60 disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:text-slate-400 transition"
+                                            title="Geser Turun"
+                                        >
+                                            <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                                        </button>
+                                    </div>
                                 </li>
                             @endforeach
                         </ul>
@@ -240,24 +262,31 @@
         const m = items.length;
         const weights = calculateRocWeights(m);
 
+        hiddenInputs.innerHTML = '';
+        bobotPreview.innerHTML = '';
+
+        const colors = ['bg-emerald-500', 'bg-teal-500', 'bg-cyan-500', 'bg-sky-500', 'bg-blue-500', 'bg-violet-500'];
+
         items.forEach((item, index) => {
+            // Update Nomor Urut di Kiri
             const badge = item.querySelector('.rank-badge');
             if (badge) badge.textContent = index + 1;
-        });
 
-        hiddenInputs.innerHTML = '';
-        items.forEach((item) => {
+            // Update Status Disabled pada Tombol Panah
+            const btnUp = item.querySelector('.btn-move-up');
+            const btnDown = item.querySelector('.btn-move-down');
+            if (btnUp) btnUp.disabled = (index === 0);
+            if (btnDown) btnDown.disabled = (index === m - 1);
+
+            // Re-generate hidden input
             const input = document.createElement('input');
             input.type = 'hidden';
             input.name = 'urutan_kriteria[]';
             input.value = item.dataset.id;
             hiddenInputs.appendChild(input);
-        });
 
-        bobotPreview.innerHTML = '';
-        const colors = ['bg-emerald-500', 'bg-teal-500', 'bg-cyan-500', 'bg-sky-500', 'bg-blue-500', 'bg-violet-500'];
-        items.forEach((item, index) => {
-            const nama = item.querySelector('.flex-1 span').textContent.trim();
+            // Re-generate preview bobot ROC
+            const nama = item.querySelector('.min-w-0 span').textContent.trim();
             const bobot = weights[index];
             const pct = (bobot * 100).toFixed(2);
             const color = colors[index] || 'bg-slate-500';
@@ -267,7 +296,7 @@
                     <span class="text-[11px] font-semibold text-slate-600 w-4 text-right">${index + 1}.</span>
                     <div class="flex-1">
                         <div class="flex justify-between items-center mb-0.5">
-                            <span class="text-[11px] font-medium text-slate-700 truncate max-w-[110px]">${nama}</span>
+                            <span class="text-[11px] font-medium text-slate-700 truncate max-w-[140px]">${nama}</span>
                             <span class="text-[11px] font-bold text-slate-800">${pct}%</span>
                         </div>
                         <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -277,6 +306,26 @@
                 </div>
             `;
         });
+    }
+
+    // Tombol Panah Naik
+    function moveItemUp(btn) {
+        const item = btn.closest('.sortable-item');
+        const prev = item.previousElementSibling;
+        if (prev) {
+            sortableList.insertBefore(item, prev);
+            updateAfterSort();
+        }
+    }
+
+    // Tombol Panah Turun
+    function moveItemDown(btn) {
+        const item = btn.closest('.sortable-item');
+        const next = item.nextElementSibling;
+        if (next) {
+            sortableList.insertBefore(next, item);
+            updateAfterSort();
+        }
     }
 
     // Deteksi GPS Geolocation
@@ -317,14 +366,19 @@
         );
     }
 
+    // Inisialisasi Sortable.js
     Sortable.create(sortableList, {
-        animation: 200,
-        ghostClass: 'opacity-40',
-        chosenClass: 'ring-2 ring-emerald-400 shadow-lg scale-[1.02]',
+        animation: 150,
+        filter: '.btn-move-up, .btn-move-down',
+        preventOnFilter: false,
+        ghostClass: 'bg-emerald-50/70',
+        chosenClass: 'ring-2',
         dragClass: 'shadow-xl',
         onEnd: updateAfterSort,
     });
 
+    // Inisialisasi awal saat halaman dibuka
+    document.addEventListener('DOMContentLoaded', updateAfterSort);
     updateAfterSort();
 </script>
 @endpush
