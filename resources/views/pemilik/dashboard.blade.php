@@ -99,9 +99,27 @@
                         </p>
 
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-                            <div class="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                <p class="text-lg font-extrabold text-amber-600">{{ $toko->nilaiAlternatif->count() }}</p>
-                                <p class="text-[11px] font-semibold text-slate-500">Kriteria Ternilai</p>
+                            {{-- Status Penilaian Admin (menggantikan card angka yang membingungkan) --}}
+                            <div class="col-span-2 sm:col-span-1 flex flex-col items-center justify-center p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                @if($toko->nilai_alternatif_count >= $totalKriteria && $totalKriteria > 0)
+                                    {{-- Sudah dinilai lengkap --}}
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 mb-1">
+                                        <i class="fa-solid fa-circle-check text-[10px]"></i> Sudah Dinilai Admin
+                                    </span>
+                                    <p class="text-[10px] text-slate-400 text-center">{{ $toko->nilai_alternatif_count }} dari {{ $totalKriteria }} kriteria</p>
+                                @elseif($toko->nilai_alternatif_count > 0)
+                                    {{-- Sebagian dinilai --}}
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-200 mb-1">
+                                        <i class="fa-solid fa-clock text-[10px]"></i> Penilaian Sebagian
+                                    </span>
+                                    <p class="text-[10px] text-slate-400 text-center">{{ $toko->nilai_alternatif_count }} dari {{ $totalKriteria }} kriteria</p>
+                                @else
+                                    {{-- Belum dinilai sama sekali --}}
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-500 border border-slate-200 mb-1">
+                                        <i class="fa-solid fa-hourglass-half text-[10px]"></i> Menunggu Penilaian
+                                    </span>
+                                    <p class="text-[10px] text-slate-400 text-center">Menunggu admin menilai</p>
+                                @endif
                             </div>
                             <div class="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
                                 <p class="text-sm font-bold text-slate-800 truncate">{{ $toko->jam_operasional ?? '-' }}</p>
@@ -113,21 +131,13 @@
                             </div>
                         </div>
 
-                        {{-- Nilai Kriteria Toko --}}
-                        @if($toko->nilaiAlternatif->count() > 0)
-                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Nilai Kriteria Toko</h3>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                @foreach($toko->nilaiAlternatif as $nilai)
-                                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                                        <p class="text-[11px] font-semibold text-slate-500 mb-1 truncate">{{ $nilai->kriteria->nama_kriteria }}</p>
-                                        <div class="flex items-center gap-2">
-                                            <div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden">
-                                                <div class="h-2 bg-amber-500 rounded-full" style="width: {{ $nilai->nilai }}%"></div>
-                                            </div>
-                                            <span class="font-extrabold text-xs text-slate-800 font-mono">{{ $nilai->nilai }}</span>
-                                        </div>
-                                    </div>
-                                @endforeach
+                        {{-- Informasi status penilaian untuk pemilik (tanpa detail skor) --}}
+                        @if($toko->nilai_alternatif_count === 0)
+                            <div class="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50 border border-amber-200">
+                                <i class="fa-solid fa-circle-info text-amber-500 text-sm mt-0.5 shrink-0"></i>
+                                <p class="text-[11px] text-amber-800 leading-relaxed">
+                                    <strong>Toko Anda belum dinilai oleh admin.</strong> Penilaian kriteria toko dilakukan oleh admin sistem dan akan digunakan dalam proses rekomendasi. Anda tidak perlu melakukan apapun — admin akan segera menilai toko Anda.
+                                </p>
                             </div>
                         @endif
                     </div>

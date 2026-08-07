@@ -91,29 +91,68 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {{-- Latitude --}}
-                <div>
-                    <label for="latitude" class="block text-xs font-semibold text-slate-700 mb-1">Latitude</label>
-                    <input 
-                        type="text" 
-                        id="latitude" 
-                        name="latitude" 
-                        value="{{ old('latitude', $toko->latitude) }}" 
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-amber-500"
-                    />
+            {{-- Section Koordinat Lokasi Toko & GPS Detection --}}
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-location-dot text-amber-600"></i>
+                            Koordinat Lokasi Toko (GPS)
+                        </label>
+                        <p class="text-[11px] text-slate-500">Gunakan tombol di sebelah kanan atau atur koordinat secara manual.</p>
+                    </div>
+                    <button
+                        type="button"
+                        id="btn-detect-gps"
+                        onclick="detectStoreLocation()"
+                        class="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 shrink-0"
+                    >
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                        Deteksi Lokasi Saya
+                    </button>
                 </div>
 
-                {{-- Longitude --}}
-                <div>
-                    <label for="longitude" class="block text-xs font-semibold text-slate-700 mb-1">Longitude</label>
-                    <input 
-                        type="text" 
-                        id="longitude" 
-                        name="longitude" 
-                        value="{{ old('longitude', $toko->longitude) }}" 
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-amber-500"
-                    />
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {{-- Latitude --}}
+                    <div>
+                        <label for="latitude" class="block text-[11px] font-semibold text-slate-600 mb-1">Latitude Google Maps</label>
+                        <input 
+                            type="text" 
+                            id="latitude" 
+                            name="latitude" 
+                            value="{{ old('latitude', $toko->latitude) }}" 
+                            placeholder="-8.1695" 
+                            oninput="updateMapFromInputs()"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        />
+                    </div>
+
+                    {{-- Longitude --}}
+                    <div>
+                        <label for="longitude" class="block text-[11px] font-semibold text-slate-600 mb-1">Longitude Google Maps</label>
+                        <input 
+                            type="text" 
+                            id="longitude" 
+                            name="longitude" 
+                            value="{{ old('longitude', $toko->longitude) }}" 
+                            placeholder="113.7152" 
+                            oninput="updateMapFromInputs()"
+                            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        />
+                    </div>
+                </div>
+
+                <p id="gps-status" class="text-[11px] text-slate-500 italic">
+                    Klik "Deteksi Lokasi Saya" untuk mendeteksi koordinat otomatis dari perangkat, atau klik/geser marker pada peta.
+                </p>
+
+                {{-- Map Preview --}}
+                <div class="mt-2">
+                    <div class="flex justify-between items-center mb-1 text-[11px]">
+                        <span class="font-semibold text-slate-600">Preview Lokasi Peta (OpenStreetMap):</span>
+                        <span id="map-coords-label" class="font-mono text-slate-400 font-bold"></span>
+                    </div>
+                    <div id="map-preview" class="w-full h-56 rounded-xl border border-slate-300 overflow-hidden shadow-inner z-0"></div>
                 </div>
             </div>
 
@@ -129,3 +168,119 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    let map, marker;
+
+    function initMapPreview() {
+        const latInput = document.getElementById('latitude');
+        const lngInput = document.getElementById('longitude');
+
+        let lat = parseFloat(latInput.value) || -8.1695;
+        let lng = parseFloat(lngInput.value) || 113.7152;
+
+        map = L.map('map-preview').setView([lat, lng], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+        updateCoordsLabel(lat, lng);
+
+        // Saat marker digeser
+        marker.on('dragend', function (e) {
+            const coord = marker.getLatLng();
+            latInput.value = coord.lat.toFixed(6);
+            lngInput.value = coord.lng.toFixed(6);
+            updateCoordsLabel(coord.lat, coord.lng);
+        });
+
+        // Saat peta diklik
+        map.on('click', function (e) {
+            marker.setLatLng(e.latlng);
+            latInput.value = e.latlng.lat.toFixed(6);
+            lngInput.value = e.latlng.lng.toFixed(6);
+            updateCoordsLabel(e.latlng.lat, e.latlng.lng);
+        });
+    }
+
+    function updateMapFromInputs() {
+        const lat = parseFloat(document.getElementById('latitude').value);
+        const lng = parseFloat(document.getElementById('longitude').value);
+
+        if (!isNaN(lat) && !isNaN(lng) && map && marker) {
+            const newLatLng = new L.LatLng(lat, lng);
+            marker.setLatLng(newLatLng);
+            map.panTo(newLatLng);
+            updateCoordsLabel(lat, lng);
+        }
+    }
+
+    function updateCoordsLabel(lat, lng) {
+        const label = document.getElementById('map-coords-label');
+        if (label) {
+            label.textContent = `${parseFloat(lat).toFixed(6)}, ${parseFloat(lng).toFixed(6)}`;
+        }
+    }
+
+    function detectStoreLocation() {
+        const status = document.getElementById('gps-status');
+        const btn = document.getElementById('btn-detect-gps');
+
+        if (!navigator.geolocation) {
+            status.textContent = 'Geolocation tidak didukung oleh browser ini.';
+            status.className = 'text-[11px] text-rose-500 font-semibold';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mendeteksi...';
+        status.textContent = 'Meminta izin lokasi GPS perangkat...';
+        status.className = 'text-[11px] text-amber-600 italic font-semibold';
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude.toFixed(6);
+                const lng = position.coords.longitude.toFixed(6);
+
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lng;
+
+                updateMapFromInputs();
+
+                status.textContent = `Lokasi GPS berhasil dideteksi! (${lat}, ${lng})`;
+                status.className = 'text-[11px] text-emerald-600 font-bold';
+
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Terdeteksi';
+            },
+            (error) => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Coba Lagi';
+
+                let msg = 'Gagal mendeteksi lokasi. Pastikan izin lokasi browser diaktifkan, atau isi koordinat secara manual.';
+                if (error.code === error.PERMISSION_DENIED) {
+                    msg = 'Gagal mendeteksi lokasi. Pastikan izin lokasi browser diaktifkan, atau isi koordinat secara manual.';
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    msg = 'Informasi lokasi tidak tersedia pada perangkat. Silakan isi koordinat secara manual.';
+                } else if (error.code === error.TIMEOUT) {
+                    msg = 'Waktu permintaan lokasi habis. Silakan coba lagi atau isi koordinat secara manual.';
+                }
+
+                status.textContent = msg;
+                status.className = 'text-[11px] text-rose-600 font-semibold';
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    }
+
+    document.addEventListener('DOMContentLoaded', initMapPreview);
+</script>
+@endpush

@@ -3,6 +3,18 @@
 @section('title', 'Detail Toko - ' . $toko->nama)
 
 @section('content')
+{{-- Flash Message --}}
+@if(session('success'))
+    <div class="bg-emerald-50 border-b border-emerald-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex items-center gap-2 text-emerald-800 text-sm">
+                <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                {{ session('success') }}
+            </div>
+        </div>
+    </div>
+@endif
+
 <!-- Breadcrumbs -->
 <div class="bg-white border-b border-slate-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
@@ -105,7 +117,7 @@
             </div>
 
             <!-- Card Nilai Kriteria Toko -->
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs" id="spk-section">
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -114,18 +126,46 @@
                         </h2>
                         <p class="text-xs text-slate-500">Skala Penilaian Kriteria (1 - 100)</p>
                     </div>
+                    {{-- Tombol Isi Nilai: HANYA muncul untuk admin yang sudah login --}}
+                    @auth
+                        @if(Auth::user()->role === 'admin')
+                            <button
+                                type="button"
+                                id="btn-open-nilai-modal"
+                                onclick="document.getElementById('modal-nilai-kriteria').classList.remove('hidden');
+                                         document.body.classList.add('overflow-hidden');"
+                                class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-sm"
+                            >
+                                <i class="fa-solid fa-{{ $toko->nilaiAlternatif->isEmpty() ? 'plus' : 'pen-to-square' }}"></i>
+                                {{ $toko->nilaiAlternatif->isEmpty() ? 'Isi Nilai Kriteria' : 'Edit Nilai Kriteria' }}
+                            </button>
+                        @endif
+                    @endauth
                 </div>
 
                 @if($toko->nilaiAlternatif->isEmpty())
-                    <p class="text-xs text-slate-400 italic">Belum ada nilai kriteria yang diinputkan untuk toko ini.</p>
+                    @auth
+                        @if(Auth::user()->role === 'admin')
+                            <div class="flex items-center gap-3 p-4 rounded-xl bg-amber-50 border border-amber-200">
+                                <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
+                                <p class="text-xs text-amber-800">
+                                    Toko ini belum memiliki nilai kriteria. Klik <strong>"Isi Nilai Kriteria"</strong> untuk mengisinya.
+                                </p>
+                            </div>
+                        @else
+                            <p class="text-xs text-slate-400 italic">Belum dinilai admin &mdash; nilai kriteria SPK akan segera diisi oleh admin sistem.</p>
+                        @endif
+                    @else
+                        <p class="text-xs text-slate-400 italic">Belum dinilai admin &mdash; nilai kriteria SPK akan segera diisi oleh admin sistem.</p>
+                    @endauth
                 @else
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         @foreach($toko->nilaiAlternatif as $nilai)
                             <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="font-bold text-xs text-slate-800">{{ $nilai->kriteria->nama_kriteria }}</span>
-                                    <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono">
-                                        {{ $nilai->jenis === 'cost' ? 'Cost' : 'Benefit' }}
+                                    <span class="text-xs font-semibold px-2 py-0.5 rounded {{ $nilai->kriteria->jenis === 'cost' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-800' }} font-mono">
+                                        {{ $nilai->kriteria->jenis === 'cost' ? 'Cost' : 'Benefit' }}
                                     </span>
                                 </div>
                                 <div class="flex items-center gap-3">
@@ -172,6 +212,112 @@
 
     </div>
 </div>
+
+{{-- ============================================================
+     MODAL: Form Isi/Edit Nilai Kriteria (hanya render untuk admin)
+     ============================================================ --}}
+@auth
+@if(Auth::user()->role === 'admin')
+<div id="modal-nilai-kriteria"
+     class="hidden fixed inset-0 z-[9999] flex items-center justify-center p-4"
+     role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+    {{-- Overlay --}}
+    <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"
+         onclick="closeNilaiModal()"></div>
+
+    {{-- Modal Panel --}}
+    <div class="relative z-10 w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
+
+        {{-- Modal Header --}}
+        <div class="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-slate-900 to-emerald-950">
+            <div>
+                <h3 id="modal-title" class="text-base font-extrabold text-white">Isi Nilai Kriteria SPK</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Toko: <span class="font-semibold text-emerald-400">{{ $toko->nama }}</span></p>
+            </div>
+            <button type="button" onclick="closeNilaiModal()"
+                    class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        {{-- Validation Errors (ditampilkan ulang jika ada error dari submit) --}}
+        @if($errors->any())
+            <div class="mx-6 mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-1">
+                <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> Terdapat kesalahan validasi:</p>
+                @foreach($errors->all() as $error)
+                    <p>- {{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
+
+        {{-- Form --}}
+        <form action="{{ route('toko.nilai-kriteria.update', $toko->id) }}" method="POST">
+            @csrf
+            <div class="px-6 py-4 space-y-3 max-h-[60vh] overflow-y-auto">
+                @forelse($kriterias as $k)
+                    @php $val = old("nilai.{$k->id}", $nilaiMap[$k->id] ?? ''); @endphp
+                    <div class="flex items-center justify-between gap-4 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                        <div class="min-w-0">
+                            <span class="font-bold text-sm text-slate-900 block">{{ $k->nama_kriteria }}</span>
+                            <span class="text-[11px] font-semibold {{ $k->jenis === 'benefit' ? 'text-emerald-600' : 'text-rose-600' }}">
+                                {{ ucfirst($k->jenis) }}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <input
+                                type="number"
+                                name="nilai[{{ $k->id }}]"
+                                id="nilai_{{ $k->id }}"
+                                value="{{ $val }}"
+                                min="0" max="100" step="1"
+                                required
+                                placeholder="0–100"
+                                class="w-20 px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            />
+                            <span class="text-xs text-slate-400 font-mono">/100</span>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-xs text-slate-400 italic text-center py-4">Belum ada kriteria yang terdaftar di sistem.</p>
+                @endforelse
+            </div>
+
+            {{-- Footer --}}
+            <div class="px-6 py-4 border-t border-slate-100 flex justify-end gap-3 bg-slate-50">
+                <button type="button" onclick="closeNilaiModal()"
+                        class="px-4 py-2.5 border border-slate-300 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
+                    Batal
+                </button>
+                <button type="submit"
+                        class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i> Simpan Nilai Kriteria
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function closeNilaiModal() {
+        document.getElementById('modal-nilai-kriteria').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+    // Buka modal otomatis kalau ada error validasi (agar error tidak hilang)
+    @if($errors->any())
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('modal-nilai-kriteria').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        });
+    @endif
+    // Tutup modal dengan tombol Escape
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeNilaiModal();
+    });
+</script>
+@endif
+@endauth
+
 @endsection
 
 @push('scripts')

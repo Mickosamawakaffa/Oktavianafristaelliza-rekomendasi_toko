@@ -11,10 +11,23 @@ use Illuminate\Http\Request;
 class NilaiAlternatifAdminController extends Controller
 {
     /**
+     * Tolak secara eksplisit semua akses dari pemilik_toko ke controller ini.
+     * Defense-in-depth: sudah ada middleware role:admin di route, ini lapisan ke-2.
+     */
+    private function denyPemilikToko(): void
+    {
+        if (auth()->check() && auth()->user()->role === 'pemilik_toko') {
+            abort(403, 'Akses Ditolak: Pemilik toko tidak diizinkan mengakses atau mengubah nilai kriteria toko.');
+        }
+    }
+
+    /**
      * Tampilkan matriks nilai alternatif toko per kriteria.
      */
     public function index()
     {
+        $this->denyPemilikToko();
+
         $kriterias = Kriteria::all();
         $tokos = Toko::with(['nilaiAlternatif'])->paginate(10);
 
@@ -26,6 +39,8 @@ class NilaiAlternatifAdminController extends Controller
      */
     public function edit($tokoId)
     {
+        $this->denyPemilikToko();
+
         $toko = Toko::with('nilaiAlternatif')->findOrFail($tokoId);
         $kriterias = Kriteria::all();
 
@@ -37,9 +52,12 @@ class NilaiAlternatifAdminController extends Controller
 
     /**
      * Update nilai kriteria toko dengan validasi angka (skala 1-100).
+     * Hanya admin yang diizinkan. Pemilik toko akan mendapat 403.
      */
     public function update(Request $request, $tokoId)
     {
+        $this->denyPemilikToko();
+
         $toko = Toko::findOrFail($tokoId);
 
         $request->validate([

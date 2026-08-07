@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 // ─── Halaman Publik (Tanpa Login) ───────────────────────────────────────────
 Route::get('/', [TokoController::class, 'index'])->name('toko.index');
 Route::get('/toko/{id}', [TokoController::class, 'show'])->name('toko.show');
+// Hanya admin yang bisa POST ini (guard ada di controller, bukan middleware)
+Route::post('/toko/{id}/nilai-kriteria', [TokoController::class, 'updateNilaiKriteria'])->name('toko.nilai-kriteria.update')->middleware('auth');
 
 // ─── Autentikasi (Guest Only) ────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {

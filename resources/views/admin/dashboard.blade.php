@@ -75,6 +75,59 @@
         </div>
     </div>
 
+    {{-- Toko Perlu Dinilai --}}
+    @if($tokoPerluDinilai->isNotEmpty())
+    <div class="mb-8 bg-white rounded-2xl border border-amber-200 shadow-xs overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-4 bg-amber-50 border-b border-amber-200">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-amber-500 text-white flex items-center justify-center">
+                    <i class="fa-solid fa-triangle-exclamation text-sm"></i>
+                </div>
+                <div>
+                    <h2 class="text-sm font-extrabold text-amber-900">Toko Belum Dinilai</h2>
+                    <p class="text-[11px] text-amber-600">{{ $tokoPerluDinilai->count() }} toko perlu segera diisi nilai kriterianya</p>
+                </div>
+            </div>
+            <a href="{{ route('admin.nilai-alternatif.index') }}" class="text-xs font-semibold text-amber-700 hover:text-amber-900 flex items-center gap-1">
+                Lihat semua <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+        </div>
+        <div class="divide-y divide-slate-100">
+            @foreach($tokoPerluDinilai->take(8) as $toko)
+            <div class="flex items-center justify-between px-6 py-3 hover:bg-amber-50/40 transition-colors">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-slate-200 text-slate-600 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-shirt text-xs"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-xs font-bold text-slate-900 truncate">{{ $toko->nama }}</p>
+                        <p class="text-[11px] text-slate-400 truncate">{{ $toko->alamat }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0 ml-4">
+                    @if($toko->nilai_alternatif_count === 0)
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 border border-rose-200">Belum dinilai</span>
+                    @else
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-700 border border-yellow-200">Sebagian ({{ $toko->nilai_alternatif_count }})</span>
+                    @endif
+                    <a href="{{ route('admin.nilai-alternatif.edit', $toko->id) }}"
+                       class="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold rounded-lg transition flex items-center gap-1">
+                        <i class="fa-solid fa-pen-to-square text-[10px]"></i> Nilai Sekarang
+                    </a>
+                </div>
+            </div>
+            @endforeach
+        </div>
+        @if($tokoPerluDinilai->count() > 8)
+        <div class="px-6 py-3 bg-amber-50/60 border-t border-amber-100 text-center">
+            <a href="{{ route('admin.nilai-alternatif.index') }}" class="text-xs font-semibold text-amber-700 hover:underline">
+                + {{ $tokoPerluDinilai->count() - 8 }} toko lainnya &mdash; Lihat semua
+            </a>
+        </div>
+        @endif
+    </div>
+    @endif
+
     {{-- Recent Data --}}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {{-- Toko Terbaru --}}

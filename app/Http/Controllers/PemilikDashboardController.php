@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kriteria;
 use App\Models\Toko;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,11 +15,14 @@ class PemilikDashboardController extends Controller
     public function index()
     {
         $user = Auth::user();
+        // Hanya load count nilai, BUKAN detail skor — pemilik toko tidak perlu tahu angkanya
         $tokoSaya = Toko::where('pemilik_id', $user->id)
-            ->with('nilaiAlternatif.kriteria')
+            ->withCount('nilaiAlternatif')
             ->get();
 
-        return view('pemilik.dashboard', compact('tokoSaya'));
+        $totalKriteria = Kriteria::count();
+
+        return view('pemilik.dashboard', compact('tokoSaya', 'totalKriteria'));
     }
 
     /**
