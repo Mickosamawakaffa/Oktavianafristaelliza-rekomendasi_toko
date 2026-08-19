@@ -82,7 +82,7 @@ class RocSmartService
     public function calculateUtility(float $val, float $min, float $max, string $jenis): float
     {
         // Jika min dan max sama (seluruh toko bernilai sama pada kriteria ini)
-        if (abs($max - $min) < 1e-9) {
+        if ($max - $min == 0 || abs($max - $min) < 1e-9) {
             return 1.0;
         }
 
@@ -108,6 +108,18 @@ class RocSmartService
     {
         if (empty($alternativesValues)) {
             return [];
+        }
+
+        // Jika hanya ada 1 toko, skip normalisasi min-max dan langsung beri utility 100% (1.0) di semua kriteria
+        if (count($alternativesValues) === 1) {
+            $utilities = [];
+            foreach ($alternativesValues as $tokoId => $kriteriaVals) {
+                $utilities[$tokoId] = [];
+                foreach ($kriteriaVals as $kriteriaId => $val) {
+                    $utilities[$tokoId][$kriteriaId] = 1.0;
+                }
+            }
+            return $utilities;
         }
 
         // Cari C_min dan C_max per kriteria
@@ -190,6 +202,17 @@ class RocSmartService
     public function processRocSmart(array $orderedKriteriaIds, array $alternativesValues, array $kriteriaTypes): array
     {
         $weights = $this->calculateRocWeights($orderedKriteriaIds);
+
+        // Jika 0 toko yang diproses
+        if (empty($alternativesValues)) {
+            return [
+                'weights' => $weights,
+                'utilities' => [],
+                'rankings' => [],
+                'message' => 'Belum ada toko dengan data lengkap yang bisa direkomendasikan saat ini',
+            ];
+        }
+
         $utilities = $this->calculateUtilitiesForMatrix($alternativesValues, $kriteriaTypes);
         $rankings = $this->calculateFinalScores($utilities, $weights);
 

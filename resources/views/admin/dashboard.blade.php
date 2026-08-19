@@ -134,7 +134,7 @@
         <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
             <div class="flex justify-between items-center mb-5">
                 <h2 class="text-base font-bold text-slate-900">Toko Terbaru</h2>
-                <a href="{{ route('toko.index') }}" class="text-xs font-semibold text-emerald-600 hover:underline flex items-center gap-1">Lihat semua <i class="fa-solid fa-arrow-right text-[10px]"></i></a>
+                <a href="{{ route('admin.toko.index') }}" class="text-xs font-semibold text-emerald-600 hover:underline flex items-center gap-1">Lihat semua <i class="fa-solid fa-arrow-right text-[10px]"></i></a>
             </div>
             <div class="space-y-3">
                 @foreach($tokoTerbaru as $toko)
@@ -143,7 +143,14 @@
                             <i class="fa-solid fa-shirt"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-xs font-semibold text-slate-800 truncate">{{ $toko->nama }}</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-xs font-semibold text-slate-800 truncate">{{ $toko->nama }}</p>
+                                @if($toko->isKriteriaLengkap())
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">Lengkap</span>
+                                @else
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 shrink-0">Belum Lengkap</span>
+                                @endif
+                            </div>
                             <p class="text-[11px] text-slate-500 truncate">{{ $toko->alamat }}</p>
                         </div>
                         <a href="{{ route('toko.show', $toko->id) }}" class="shrink-0 text-[10px] text-slate-400 hover:text-emerald-600 font-medium border border-slate-200 rounded-lg px-2 py-1 hover:border-emerald-300 transition-colors">Detail</a>

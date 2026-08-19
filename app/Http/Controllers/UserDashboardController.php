@@ -103,8 +103,15 @@ class UserDashboardController extends Controller
         $userLat = $request->input('user_lat', session('user_lat', -8.1724));
         $userLng = $request->input('user_lng', session('user_lng', 113.7000));
 
-        // Ambil semua toko
-        $tokos = Toko::with(['nilaiAlternatif.kriteria'])->get();
+        // Ambil toko yang data kriterianya sudah lengkap
+        $tokos = Toko::lengkap()->with(['nilaiAlternatif.kriteria'])->get();
+
+        // Guard: Jika 0 toko yang data kriterianya lengkap
+        if ($tokos->isEmpty()) {
+            return redirect()->route('user.preferensi')
+                ->with('info', 'Belum ada toko dengan data lengkap yang bisa direkomendasikan saat ini.');
+        }
+
         $kriteriaIds = $preferensiUser->pluck('kriteria_id')->toArray();
 
         // Cari ID Kriteria "Lokasi"

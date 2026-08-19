@@ -50,6 +50,7 @@
                     <tr>
                         <th class="py-3.5 px-4">#</th>
                         <th class="py-3.5 px-4">Nama Toko</th>
+                        <th class="py-3.5 px-4">Status Data</th>
                         <th class="py-3.5 px-4">Alamat</th>
                         <th class="py-3.5 px-4">Jam Operasional</th>
                         <th class="py-3.5 px-4">Pemilik Toko</th>
@@ -65,6 +66,17 @@
                             <td class="py-3.5 px-4">
                                 <span class="font-bold text-slate-900 block text-sm">{{ $toko->nama }}</span>
                                 <span class="text-[11px] text-slate-400 font-mono">{{ $toko->media_sosial ?? '-' }}</span>
+                            </td>
+                            <td class="py-3.5 px-4">
+                                @if($toko->isKriteriaLengkap())
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[11px] font-bold">
+                                        <i class="fa-solid fa-circle-check text-[10px]"></i> Lengkap
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200 text-[11px] font-bold">
+                                        <i class="fa-solid fa-triangle-exclamation text-[10px]"></i> Belum Lengkap
+                                    </span>
+                                @endif
                             </td>
                             <td class="py-3.5 px-4 max-w-xs truncate">
                                 {{ $toko->alamat }}
@@ -103,7 +115,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-8 text-center text-slate-400 italic">
+                            <td colspan="7" class="py-8 text-center text-slate-400 italic">
                                 Belum ada data toko. Klik tombol "Tambah Toko Baru" untuk membuat toko.
                             </td>
                         </tr>

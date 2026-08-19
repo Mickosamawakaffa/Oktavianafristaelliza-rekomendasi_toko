@@ -11,11 +11,12 @@ use Illuminate\Support\Facades\Auth;
 class TokoController extends Controller
 {
     /**
-     * Tampilkan daftar semua toko fashion secondhand.
+     * Tampilkan daftar toko fashion secondhand yang nilai kriterianya sudah lengkap.
      */
     public function index(Request $request)
     {
-        $query = Toko::with(['nilaiAlternatif.kriteria']);
+        // Hanya toko dengan nilai kriteria lengkap yang tampil di halaman publik
+        $query = Toko::lengkap()->with(['nilaiAlternatif.kriteria']);
 
         // Filter pencarian berdasarkan nama atau alamat
         if ($request->has('search') && !empty($request->search)) {

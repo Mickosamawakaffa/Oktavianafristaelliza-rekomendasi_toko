@@ -49,7 +49,18 @@
                                 {{ $tokos->firstItem() + $index }}
                             </td>
                             <td class="py-3.5 px-4 font-bold text-slate-900 text-sm">
-                                {{ $toko->nama }}
+                                <div class="flex items-center gap-2">
+                                    <span>{{ $toko->nama }}</span>
+                                    @if($toko->isKriteriaLengkap())
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200 text-[10px] font-bold">
+                                            <i class="fa-solid fa-check text-[9px]"></i> Lengkap
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 text-[10px] font-bold">
+                                            <i class="fa-solid fa-exclamation text-[9px]"></i> Belum Lengkap
+                                        </span>
+                                    @endif
+                                </div>
                                 <span class="block text-[11px] font-normal text-slate-400 truncate">{{ $toko->alamat }}</span>
                             </td>
                             @foreach($kriterias as $k)

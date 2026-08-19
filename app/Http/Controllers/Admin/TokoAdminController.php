@@ -14,7 +14,8 @@ class TokoAdminController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Toko::with('pemilik');
+        // Admin dapat melihat semua toko (baik lengkap maupun belum)
+        $query = Toko::with(['pemilik', 'nilaiAlternatif']);
 
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;

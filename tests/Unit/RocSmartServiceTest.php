@@ -107,4 +107,47 @@ class RocSmartServiceTest extends TestCase
         $this->assertEquals('Toko B', $rankings[1]['toko_id']);
         $this->assertEqualsWithDelta(5 / 18, $rankings[1]['score'], 0.0001);
     }
+
+    /**
+     * Test 4: Division by zero prevention when max - min == 0.
+     */
+    public function test_division_by_zero_handling_when_max_equals_min(): void
+    {
+        // 2 Toko dengan nilai harga (cost) sama persis: max = 50, min = 50
+        $uA = $this->service->calculateUtility(50, 50, 50, 'cost');
+        $uB = $this->service->calculateUtility(50, 50, 50, 'benefit');
+
+        $this->assertEquals(1.0, $uA, 'Utility harus 1.0 (100%) jika max - min == 0');
+        $this->assertEquals(1.0, $uB, 'Utility harus 1.0 (100%) jika max - min == 0');
+    }
+
+    /**
+     * Test 5: Handling 0 stores.
+     */
+    public function test_handling_zero_stores(): void
+    {
+        $result = $this->service->processRocSmart(['C1', 'C2'], [], ['C1' => 'benefit', 'C2' => 'cost']);
+
+        $this->assertEmpty($result['rankings']);
+        $this->assertArrayHasKey('message', $result);
+        $this->assertStringContainsString('Belum ada toko', $result['message']);
+    }
+
+    /**
+     * Test 6: Handling single store case (skip min-max, set utility 1.0 for all criteria).
+     */
+    public function test_handling_single_store(): void
+    {
+        $alternativesValues = [
+            'Toko Tunggal' => ['C1' => 80, 'C2' => 90],
+        ];
+
+        $result = $this->service->processRocSmart(['C1', 'C2'], $alternativesValues, ['C1' => 'benefit', 'C2' => 'cost']);
+
+        $this->assertCount(1, $result['rankings']);
+        $this->assertEquals('Toko Tunggal', $result['rankings'][0]['toko_id']);
+        $this->assertEquals(1.0, $result['rankings'][0]['score']);
+        $this->assertEquals(1.0, $result['utilities']['Toko Tunggal']['C1']);
+        $this->assertEquals(1.0, $result['utilities']['Toko Tunggal']['C2']);
+    }
 }

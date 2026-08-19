@@ -24,7 +24,7 @@ class AdminDashboardController extends Controller
             'total_pemilik'  => User::where('role', 'pemilik_toko')->count(),
         ];
 
-        $tokoTerbaru = Toko::latest()->take(5)->get();
+        $tokoTerbaru = Toko::with('nilaiAlternatif')->latest()->take(5)->get();
         $userTerbaru = User::latest()->take(5)->get();
 
         // Toko yang belum dinilai admin sama sekali (jumlah nilai_alternatif < jumlah kriteria)
