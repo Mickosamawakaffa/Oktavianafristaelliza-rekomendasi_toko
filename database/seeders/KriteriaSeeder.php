@@ -31,7 +31,7 @@ class KriteriaSeeder extends Seeder
             ],
             [
                 'nama_kriteria' => 'Lokasi',
-                'jenis' => 'benefit',
+                'jenis' => 'cost',
             ],
             [
                 'nama_kriteria' => 'Ulasan',

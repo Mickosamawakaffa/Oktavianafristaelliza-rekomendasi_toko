@@ -115,7 +115,10 @@ class UserDashboardController extends Controller
         $kriteriaIds = $preferensiUser->pluck('kriteria_id')->toArray();
 
         // Cari ID Kriteria "Lokasi"
-        $kriteriaLokasi = Kriteria::where('nama_kriteria', 'like', '%Lokasi%')->first();
+        $kriteriaLokasi = Kriteria::where('nama_kriteria', 'Lokasi')->first();
+
+        // Cari ID Kriteria "Ulasan"
+        $kriteriaUlasan = Kriteria::where('nama_kriteria', 'Ulasan')->first();
 
         // Hitung jarak (km) untuk setiap toko dan bangun matriks nilai
         $storeDistances = [];
@@ -142,12 +145,18 @@ class UserDashboardController extends Controller
                 }
             }
 
-            // Jika kriteria Lokasi ada di preferensi user, override nilainya dengan jarak fisik!
-            // Jarak semakin kecil (dekat) -> Nilai Lokasi semakin tinggi/bagus (skala 100 untuk terdekat)
+            // Jika kriteria Lokasi ada di preferensi user, override nilainya dengan jarak fisik asli (km).
+            // Kriteria Lokasi berjenis 'cost': semakin kecil jarak -> utility SMART semakin tinggi.
+            // Jarak km dimasukkan langsung agar SMART dapat membedakan semua rentang jarak secara akurat.
             if ($kriteriaLokasi && in_array($kriteriaLokasi->id, $kriteriaIds)) {
-                // Gunakan jarak langsung km (akan dinormalisasi oleh SMART cost/benefit)
-                // Jika jenis = benefit: dekat = rating tinggi. Kita bisa konversi jarak km -> skor nilai 100-jarak*10
-                $alternativesValues[$toko->id][$kriteriaLokasi->id] = max(5, round(100 - ($distanceKm * 15), 1));
+                $alternativesValues[$toko->id][$kriteriaLokasi->id] = $distanceKm;
+            }
+
+            // Jika kriteria Ulasan ada di preferensi user, override nilainya dengan skor konversi
+            // dari rating_ulasan (skala 1-5 → skor 1-100), bukan nilai manual dari nilai_alternatif.
+            // Safety net: memastikan skor SMART selalu konsisten dengan rating_ulasan terbaru.
+            if ($kriteriaUlasan && in_array($kriteriaUlasan->id, $kriteriaIds) && $toko->skor_ulasan !== null) {
+                $alternativesValues[$toko->id][$kriteriaUlasan->id] = $toko->skor_ulasan;
             }
         }
 

@@ -58,17 +58,39 @@ class TokoController extends Controller
 
         $toko = Toko::findOrFail($id);
 
+        // Cari ID kriteria "Ulasan" untuk sinkronisasi rating
+        $kriteriaUlasan = Kriteria::where('nama_kriteria', 'Ulasan')->first();
+        $kriteriaUlasanId = $kriteriaUlasan?->id;
+
         $request->validate([
-            'nilai'    => ['required', 'array'],
-            'nilai.*'  => ['required', 'numeric', 'min:0', 'max:100'],
+            'nilai'         => ['required', 'array'],
+            'nilai.*'       => ['required', 'numeric', 'min:0', 'max:100'],
+            'rating_ulasan' => ['nullable', 'numeric', 'min:1', 'max:5'],
+            'jumlah_ulasan' => ['nullable', 'integer', 'min:0'],
         ], [
             'nilai.*.required' => 'Semua nilai kriteria wajib diisi.',
             'nilai.*.numeric'  => 'Nilai kriteria harus berupa angka.',
             'nilai.*.min'      => 'Nilai minimum adalah 0.',
             'nilai.*.max'      => 'Nilai maksimum adalah 100.',
+            'rating_ulasan.min' => 'Rating ulasan minimum adalah 1.',
+            'rating_ulasan.max' => 'Rating ulasan maksimum adalah 5.',
         ]);
 
+        // Simpan rating_ulasan & jumlah_ulasan ke tabel toko jika disediakan
+        if ($request->filled('rating_ulasan')) {
+            $toko->update([
+                'rating_ulasan' => (float) $request->rating_ulasan,
+                'jumlah_ulasan' => $request->jumlah_ulasan ? (int) $request->jumlah_ulasan : null,
+            ]);
+        }
+
         foreach ($request->nilai as $kriteriaId => $val) {
+            // Untuk kriteria Ulasan: gunakan skor konversi dari rating, bukan input manual
+            // Ini memastikan nilai di nilai_alternatif selalu konsisten dengan rating_ulasan di tabel toko
+            if ($kriteriaUlasanId && (int) $kriteriaId === $kriteriaUlasanId && $request->filled('rating_ulasan')) {
+                $val = round(((float) $request->rating_ulasan / 5) * 100, 1);
+            }
+
             NilaiAlternatif::updateOrCreate(
                 ['toko_id' => $toko->id, 'kriteria_id' => $kriteriaId],
                 ['nilai'   => (float) $val]
