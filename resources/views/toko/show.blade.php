@@ -35,9 +35,13 @@
         
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
             <div class="flex items-start gap-4">
-                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-900 flex items-center justify-center font-extrabold text-3xl shadow-lg shrink-0">
-                    <i class="fa-solid fa-shirt"></i>
-                </div>
+                @if($toko->gambar)
+                    <img src="{{ asset('storage/' . $toko->gambar) }}" alt="{{ $toko->nama }}" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover shadow-lg shrink-0 border-2 border-emerald-400/40" />
+                @else
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-900 flex items-center justify-center font-extrabold text-3xl shadow-lg shrink-0">
+                        <i class="fa-solid fa-shirt"></i>
+                    </div>
+                @endif
                 <div>
                     <div class="flex flex-wrap items-center gap-2 mb-2">
                         <span class="px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
@@ -82,6 +86,12 @@
             
             <!-- Card Deskripsi & Operasional -->
             <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+                @if($toko->gambar)
+                    <div class="mb-6 rounded-2xl overflow-hidden border border-slate-200 max-h-80 shadow-xs">
+                        <img src="{{ asset('storage/' . $toko->gambar) }}" alt="{{ $toko->nama }}" class="w-full h-full object-cover max-h-80 hover:scale-102 transition duration-500" />
+                    </div>
+                @endif
+
                 <h2 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-circle-info text-emerald-600"></i>
                     Informasi Toko

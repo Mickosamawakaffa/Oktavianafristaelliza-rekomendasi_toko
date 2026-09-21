@@ -27,7 +27,7 @@
     @endif
 
     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
-        <form action="{{ route('admin.toko.update', $toko->id) }}" method="POST" class="space-y-5">
+        <form action="{{ route('admin.toko.update', $toko->id) }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
             @method('PUT')
 
@@ -42,6 +42,30 @@
                     required 
                     class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 />
+            </div>
+
+            {{-- Foto/Gambar Toko --}}
+            <div>
+                <label for="gambar" class="block text-xs font-semibold text-slate-700 mb-1">Foto / Gambar Toko</label>
+                @if($toko->gambar)
+                    <div class="mb-2">
+                        <p class="text-[11px] text-slate-500 mb-1 font-medium">Gambar saat ini:</p>
+                        <img src="{{ asset('storage/' . $toko->gambar) }}" alt="{{ $toko->nama }}" class="h-36 w-auto max-w-full object-cover rounded-xl border border-slate-200 shadow-xs" />
+                    </div>
+                @endif
+                <input 
+                    type="file" 
+                    id="gambar" 
+                    name="gambar" 
+                    accept="image/jpeg,image/png,image/jpg,image/webp"
+                    onchange="previewImage(this, 'image-preview-edit')"
+                    class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <p class="text-[11px] text-slate-400 mt-1">Format: JPG, PNG, WEBP. Maksimal 2MB. Biarkan kosong jika tidak ingin mengubah gambar.</p>
+                <div id="image-preview-edit" class="mt-2 hidden">
+                    <p class="text-[11px] text-emerald-600 font-semibold mb-1">Preview gambar baru:</p>
+                    <img src="#" alt="Preview Baru" class="h-36 w-auto max-w-full object-cover rounded-xl border border-emerald-300 shadow-xs" />
+                </div>
             </div>
 
             {{-- Alamat --}}
@@ -298,6 +322,22 @@
                 maximumAge: 0
             }
         );
+    }
+
+    function previewImage(input, previewContainerId) {
+        const container = document.getElementById(previewContainerId);
+        if (!container) return;
+        const img = container.querySelector('img');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                container.classList.remove('hidden');
+            }
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            container.classList.add('hidden');
+        }
     }
 
     document.addEventListener('DOMContentLoaded', initMapPreview);

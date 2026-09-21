@@ -40,7 +40,9 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-    // CRUD Toko
+    // CRUD Toko & Verifikasi
+    Route::post('/toko/{toko}/approve', [TokoAdminController::class, 'approve'])->name('toko.approve');
+    Route::post('/toko/{toko}/reject', [TokoAdminController::class, 'reject'])->name('toko.reject');
     Route::resource('toko', TokoAdminController::class);
 
     // CRUD Kriteria

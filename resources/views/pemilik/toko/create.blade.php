@@ -25,7 +25,7 @@
     @endif
 
     <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
-        <form action="{{ route('pemilik.toko.store') }}" method="POST" class="space-y-5">
+        <form action="{{ route('pemilik.toko.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
 
             {{-- Nama Toko --}}
@@ -40,6 +40,23 @@
                     placeholder="Contoh: Thrift Vintage Jember" 
                     class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-amber-500"
                 />
+            </div>
+
+            {{-- Foto/Gambar Toko --}}
+            <div>
+                <label for="gambar" class="block text-xs font-semibold text-slate-700 mb-1">Foto / Gambar Toko</label>
+                <input 
+                    type="file" 
+                    id="gambar" 
+                    name="gambar" 
+                    accept="image/jpeg,image/png,image/jpg,image/webp"
+                    onchange="previewImage(this, 'image-preview-create')"
+                    class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+                <p class="text-[11px] text-slate-400 mt-1">Format: JPG, PNG, WEBP. Maksimal 2MB.</p>
+                <div id="image-preview-create" class="mt-2 hidden">
+                    <img src="#" alt="Preview" class="h-36 w-auto max-w-full object-cover rounded-xl border border-slate-200 shadow-xs" />
+                </div>
             </div>
 
             {{-- Alamat --}}
@@ -283,6 +300,22 @@
                 maximumAge: 0
             }
         );
+    }
+
+    function previewImage(input, previewContainerId) {
+        const container = document.getElementById(previewContainerId);
+        if (!container) return;
+        const img = container.querySelector('img');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                container.classList.remove('hidden');
+            }
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            container.classList.add('hidden');
+        }
     }
 
     document.addEventListener('DOMContentLoaded', initMapPreview);

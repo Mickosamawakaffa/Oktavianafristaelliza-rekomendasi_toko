@@ -19,11 +19,14 @@ class Toko extends Model
         'deskripsi',
         'media_sosial',
         'jam_operasional',
+        'gambar',
         'rating_ulasan',
         'jumlah_ulasan',
         'latitude',
         'longitude',
         'pemilik_id',
+        'status',
+        'catatan_verifikasi',
     ];
 
     /**
@@ -99,11 +102,45 @@ class Toko extends Model
     }
 
     /**
-     * Scope query untuk hanya mengambil toko yang nilai kriterianya sudah lengkap.
+     * Scope query untuk hanya mengambil toko yang sudah disetujui (approved).
+     */
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    /**
+     * Cek apakah status toko sudah disetujui.
+     */
+    public function isApproved(): bool
+    {
+        return $this->status === 'approved';
+    }
+
+    /**
+     * Cek apakah status toko masih menunggu verifikasi.
+     */
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    /**
+     * Cek apakah status toko ditolak oleh admin.
+     */
+    public function isRejected(): bool
+    {
+        return $this->status === 'rejected';
+    }
+
+    /**
+     * Scope query untuk hanya mengambil toko yang disetujui dan nilai kriterianya sudah lengkap.
      */
     public function scopeLengkap($query)
     {
         $totalKriteria = Kriteria::count();
+        $query = $query->where('status', 'approved');
+
         if ($totalKriteria === 0) {
             return $query;
         }

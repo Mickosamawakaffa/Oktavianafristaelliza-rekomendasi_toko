@@ -131,27 +131,32 @@
 
                     {{-- Main Content --}}
                     <div class="flex-1 p-5">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-3">
-                            <div>
-                                <div class="flex flex-wrap items-center gap-2 mb-1">
-                                    @if($rank <= 3)
-                                        <span class="text-xs font-bold px-2 py-0.5 rounded-full {{ $rankStyles['bg'] }} {{ $rankStyles['text'] }}">{{ $rankStyles['label'] }}</span>
-                                    @endif
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-3">
+                            <div class="flex items-start gap-3.5">
+                                @if($toko?->gambar)
+                                    <img src="{{ asset('storage/' . $toko->gambar) }}" alt="{{ $toko->nama }}" class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl object-cover border border-slate-200 shadow-xs shrink-0 mt-0.5" />
+                                @endif
+                                <div>
+                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                        @if($rank <= 3)
+                                            <span class="text-xs font-bold px-2 py-0.5 rounded-full {{ $rankStyles['bg'] }} {{ $rankStyles['text'] }}">{{ $rankStyles['label'] }}</span>
+                                        @endif
 
-                                    {{-- Distance Badge (Haversine Formula Result) --}}
-                                    @if($distanceKm !== null)
-                                        <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
-                                            <i class="fa-solid fa-location-arrow text-[10px]"></i>
-                                            {{ $distanceKm }} km dari Anda
-                                        </span>
-                                    @endif
+                                        {{-- Distance Badge (Haversine Formula Result) --}}
+                                        @if($distanceKm !== null)
+                                            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                                                <i class="fa-solid fa-location-arrow text-[10px]"></i>
+                                                {{ $distanceKm }} km dari Anda
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <h3 class="text-lg font-extrabold text-slate-900">{{ $toko?->nama ?? 'Toko #'.$item['toko_id'] }}</h3>
+                                    <p class="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
+                                        <i class="fa-solid fa-location-dot text-emerald-600 text-[10px]"></i>
+                                        {{ $toko?->alamat ?? 'Alamat tidak tersedia' }}
+                                    </p>
                                 </div>
-
-                                <h3 class="text-lg font-extrabold text-slate-900">{{ $toko?->nama ?? 'Toko #'.$item['toko_id'] }}</h3>
-                                <p class="text-xs text-slate-500 flex items-center gap-1 mt-0.5">
-                                    <i class="fa-solid fa-location-dot text-emerald-600 text-[10px]"></i>
-                                    {{ $toko?->alamat ?? 'Alamat tidak tersedia' }}
-                                </p>
                             </div>
                             @if($toko)
                                 <a href="{{ route('toko.show', $toko->id) }}" class="shrink-0 flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-colors">

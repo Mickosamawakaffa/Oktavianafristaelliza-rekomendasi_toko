@@ -69,10 +69,17 @@
             @foreach($tokos as $toko)
                 <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between overflow-hidden group hover:-translate-y-1">
                     <div>
-                        <!-- Header Card dengan Gradient Thumbnail Placeholder -->
-                        <div class="h-36 bg-gradient-to-r from-emerald-600 to-teal-700 p-5 relative flex flex-col justify-between text-white">
-                            <div class="flex justify-between items-start">
-                                <span class="px-2.5 py-1 rounded-full bg-black/30 backdrop-blur-md text-[11px] font-medium text-emerald-200 border border-white/10 flex items-center gap-1">
+                        <!-- Header Card dengan Thumbnail Image atau Gradient Fallback -->
+                        <div class="h-40 relative flex flex-col justify-between p-5 text-white overflow-hidden">
+                            @if($toko->gambar)
+                                <img src="{{ asset('storage/' . $toko->gambar) }}" alt="{{ $toko->nama }}" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-black/40"></div>
+                            @else
+                                <div class="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-700"></div>
+                            @endif
+
+                            <div class="relative z-10 flex justify-between items-start">
+                                <span class="px-2.5 py-1 rounded-full bg-black/40 backdrop-blur-md text-[11px] font-medium text-emerald-200 border border-white/10 flex items-center gap-1">
                                     <i class="fa-solid fa-clock text-[10px]"></i>
                                     {{ $toko->jam_operasional ?? '10:00 - 21:00' }}
                                 </span>
@@ -82,16 +89,16 @@
                                     </span>
                                 @endif
                             </div>
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-xl bg-white text-emerald-700 flex items-center justify-center font-bold text-xl shadow-md">
-                                    <i class="fa-solid fa-shirt"></i>
+                            <div class="relative z-10 flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-xl bg-white/90 backdrop-blur-md text-emerald-700 flex items-center justify-center font-bold text-lg shadow-md shrink-0">
+                                    <i class="fa-solid fa-store"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-lg text-white group-hover:text-emerald-200 transition-colors line-clamp-1">
+                                    <h3 class="font-bold text-lg text-white group-hover:text-emerald-300 transition-colors line-clamp-1">
                                         {{ $toko->nama }}
                                     </h3>
-                                    <p class="text-xs text-emerald-100 flex items-center gap-1">
-                                        <i class="fa-solid fa-location-dot text-[10px]"></i>
+                                    <p class="text-xs text-slate-200 flex items-center gap-1">
+                                        <i class="fa-solid fa-location-dot text-[10px] text-emerald-400"></i>
                                         Jember, Jawa Timur
                                     </p>
                                 </div>
