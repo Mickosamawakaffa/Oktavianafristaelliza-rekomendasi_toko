@@ -173,22 +173,24 @@ class UserDashboardController extends Controller
 
         // Gabungkan data toko & jarak ke hasil ranking
         $tokoMap = $tokos->keyBy('id');
-        $rankings = collect($result['rankings'])->map(function ($item) use ($tokoMap, $storeDistances) {
+        $rankings = collect($result['rankings'])->map(function ($item) use ($tokoMap, $storeDistances, $alternativesValues) {
             $toko = $tokoMap->get($item['toko_id']);
             $distance = $storeDistances[$item['toko_id']] ?? null;
 
             return array_merge($item, [
                 'toko'       => $toko,
                 'jarak_km'   => $distance,
+                'raw_values' => $alternativesValues[$item['toko_id']] ?? [],
             ]);
         });
 
         return view('user.hasil', [
-            'rankings'       => $rankings,
-            'preferensiUser' => $preferensiUser,
-            'weights'        => $result['weights'],
-            'userLat'        => $userLat,
-            'userLng'        => $userLng,
+            'rankings'           => $rankings,
+            'preferensiUser'     => $preferensiUser,
+            'weights'            => $result['weights'],
+            'userLat'            => $userLat,
+            'userLng'            => $userLng,
+            'alternativesValues' => $alternativesValues,
         ]);
     }
 }

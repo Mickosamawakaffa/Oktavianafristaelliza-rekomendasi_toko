@@ -5,34 +5,46 @@
 @section('content')
 @include('admin.partials.nav')
 
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
     <div class="mb-6 flex items-center justify-between">
         <div>
-            <h1 class="text-2xl font-extrabold text-slate-900">Tambah Toko Baru</h1>
-            <p class="text-xs text-slate-500">Isi formulir di bawah ini untuk menambahkan toko ke sistem.</p>
+            <h1 class="text-2xl font-extrabold text-[#0F172A]">Tambah Toko Baru</h1>
+            <p class="text-xs sm:text-sm text-[#526071]">Isi formulir di bawah ini untuk menambahkan toko ke sistem.</p>
         </div>
-        <a href="{{ route('admin.toko.index') }}" class="text-xs text-slate-500 hover:text-slate-800 font-semibold flex items-center gap-1">
-            <i class="fa-solid fa-arrow-left"></i> Kembali
+        <a href="{{ route('admin.toko.index') }}" class="text-xs font-semibold text-[#526071] hover:text-[#0F172A] flex items-center gap-1.5 min-h-[44px]">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Kembali</span>
         </a>
     </div>
 
     {{-- Validation Errors --}}
     @if($errors->any())
-        <div class="mb-5 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-1">
-            <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> Terdapat kesalahan validasi:</p>
-            @foreach($errors->all() as $error)
-                <p>- {{ $error }}</p>
-            @endforeach
+        <div class="mb-5 p-4 rounded-[12px] bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] text-xs space-y-1">
+            <p class="font-bold flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-[#DC2626] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span>Terdapat kesalahan validasi:</span>
+            </p>
+            <ul class="list-disc pl-5">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
-    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+    <div class="bg-white rounded-[16px] border border-[#E2E8F0] p-6 shadow-soft">
         <form action="{{ route('admin.toko.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
             @csrf
 
             {{-- Nama Toko --}}
             <div>
-                <label for="nama" class="block text-xs font-semibold text-slate-700 mb-1">Nama Toko <span class="text-rose-500">*</span></label>
+                <label for="nama" class="block text-xs font-semibold text-[#0F172A] mb-1.5">
+                    Nama Toko <span class="text-[#991B1B]">*</span>
+                </label>
                 <input 
                     type="text" 
                     id="nama" 
@@ -40,105 +52,112 @@
                     value="{{ old('nama') }}" 
                     required 
                     placeholder="Contoh: Thrift Vintage Jember" 
-                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    class="w-full px-3.5 py-2.5 rounded-[10px] border border-[#CBD5E1] bg-white text-xs text-[#0F172A] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] min-h-[44px]"
                 />
             </div>
 
             {{-- Foto/Gambar Toko --}}
             <div>
-                <label for="gambar" class="block text-xs font-semibold text-slate-700 mb-1">Foto / Gambar Toko</label>
+                <label for="gambar" class="block text-xs font-semibold text-[#0F172A] mb-1.5">Foto / Gambar Toko</label>
                 <input 
                     type="file" 
                     id="gambar" 
                     name="gambar" 
                     accept="image/jpeg,image/png,image/jpg,image/webp"
                     onchange="previewImage(this, 'image-preview-create')"
-                    class="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    class="w-full px-3.5 py-2 rounded-[10px] border border-[#CBD5E1] text-xs text-[#526071] file:mr-3 file:py-1.5 file:px-3 file:rounded-[8px] file:border-0 file:text-xs file:font-semibold file:bg-[#E6F4F1] file:text-[#0F766E] hover:file:bg-[#d0ece5] cursor-pointer focus:outline-none focus:border-[#0F766E]"
                 />
-                <p class="text-[11px] text-slate-400 mt-1">Format: JPG, PNG, WEBP. Maksimal 2MB.</p>
+                <p class="text-[11px] text-[#526071] mt-1">Format: JPG, PNG, WEBP. Maksimal 2MB.</p>
                 <div id="image-preview-create" class="mt-2 hidden">
-                    <img src="#" alt="Preview" class="h-36 w-auto max-w-full object-cover rounded-xl border border-slate-200 shadow-xs" />
+                    <img src="#" alt="Preview" class="h-36 w-auto max-w-full object-cover rounded-[10px] border border-[#E2E8F0] shadow-soft" />
                 </div>
             </div>
 
             {{-- Alamat --}}
             <div>
-                <label for="alamat" class="block text-xs font-semibold text-slate-700 mb-1">Alamat Lengkap <span class="text-rose-500">*</span></label>
+                <label for="alamat" class="block text-xs font-semibold text-[#0F172A] mb-1.5">
+                    Alamat Lengkap <span class="text-[#991B1B]">*</span>
+                </label>
                 <textarea 
                     id="alamat" 
                     name="alamat" 
                     rows="2" 
                     required 
                     placeholder="Jl. Kalimantan No. 12, Sumbersari, Jember" 
-                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    class="w-full px-3.5 py-2.5 rounded-[10px] border border-[#CBD5E1] bg-white text-xs text-[#0F172A] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]"
                 >{{ old('alamat') }}</textarea>
             </div>
 
             {{-- Deskripsi --}}
             <div>
-                <label for="deskripsi" class="block text-xs font-semibold text-slate-700 mb-1">Deskripsi Toko</label>
+                <label for="deskripsi" class="block text-xs font-semibold text-[#0F172A] mb-1.5">Deskripsi Toko</label>
                 <textarea 
                     id="deskripsi" 
                     name="deskripsi" 
                     rows="3" 
                     placeholder="Penjelasan produk yang dijual, keunggulan toko, dll." 
-                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    class="w-full px-3.5 py-2.5 rounded-[10px] border border-[#CBD5E1] bg-white text-xs text-[#0F172A] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E]"
                 >{{ old('deskripsi') }}</textarea>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {{-- Media Sosial --}}
                 <div>
-                    <label for="media_sosial" class="block text-xs font-semibold text-slate-700 mb-1">Media Sosial (Instagram)</label>
+                    <label for="media_sosial" class="block text-xs font-semibold text-[#0F172A] mb-1.5">Media Sosial (Instagram)</label>
                     <input 
                         type="text" 
                         id="media_sosial" 
                         name="media_sosial" 
                         value="{{ old('media_sosial') }}" 
                         placeholder="@thriftvintage_jbr" 
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        class="w-full px-3.5 py-2.5 rounded-[10px] border border-[#CBD5E1] bg-white text-xs text-[#0F172A] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] min-h-[44px]"
                     />
                 </div>
 
                 {{-- Jam Operasional --}}
                 <div>
-                    <label for="jam_operasional" class="block text-xs font-semibold text-slate-700 mb-1">Jam Operasional</label>
+                    <label for="jam_operasional" class="block text-xs font-semibold text-[#0F172A] mb-1.5">Jam Operasional</label>
                     <input 
                         type="text" 
                         id="jam_operasional" 
                         name="jam_operasional" 
                         value="{{ old('jam_operasional') }}" 
                         placeholder="10:00 - 21:00" 
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        class="w-full px-3.5 py-2.5 rounded-[10px] border border-[#CBD5E1] bg-white text-xs text-[#0F172A] focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] min-h-[44px]"
                     />
                 </div>
             </div>
 
             {{-- Section Koordinat Lokasi Toko & GPS Detection --}}
-            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="p-4 rounded-[12px] bg-[#F8FAFC] border border-[#E2E8F0] space-y-3">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <div>
-                        <label class="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                            <i class="fa-solid fa-location-dot text-emerald-600"></i>
-                            Koordinat Lokasi Toko (GPS)
+                        <label class="block text-xs font-bold text-[#0F172A] flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>Koordinat Lokasi Toko (GPS)</span>
                         </label>
-                        <p class="text-[11px] text-slate-500">Gunakan tombol di sebelah kanan atau atur koordinat secara manual.</p>
+                        <p class="text-[11px] text-[#526071]">Gunakan tombol di sebelah kanan atau atur koordinat secara manual.</p>
                     </div>
                     <button
                         type="button"
                         id="btn-detect-gps"
                         onclick="detectStoreLocation()"
-                        class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 shrink-0"
+                        class="px-3.5 py-2 bg-[#E6F4F1] hover:bg-[#d0ece5] text-[#0F766E] font-bold text-xs rounded-[8px] border border-[#0F766E]/30 transition-colors flex items-center gap-1.5 shrink-0 min-h-[36px]"
                     >
-                        <i class="fa-solid fa-location-crosshairs"></i>
-                        Deteksi Lokasi Saya
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>Deteksi Lokasi Saya</span>
                     </button>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {{-- Latitude --}}
                     <div>
-                        <label for="latitude" class="block text-[11px] font-semibold text-slate-600 mb-1">Latitude</label>
+                        <label for="latitude" class="block text-[11px] font-semibold text-[#526071] mb-1">Latitude</label>
                         <input 
                             type="text" 
                             id="latitude" 
@@ -146,13 +165,12 @@
                             value="{{ old('latitude', '-8.1695') }}" 
                             placeholder="-8.1695" 
                             oninput="updateMapFromInputs()"
-                            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            class="w-full px-3 py-2 rounded-[8px] bg-white border border-[#CBD5E1] text-xs font-mono font-bold text-[#0F172A] focus:outline-none focus:border-[#0F766E]"
                         />
                     </div>
 
-                    {{-- Longitude --}}
                     <div>
-                        <label for="longitude" class="block text-[11px] font-semibold text-slate-600 mb-1">Longitude</label>
+                        <label for="longitude" class="block text-[11px] font-semibold text-[#526071] mb-1">Longitude</label>
                         <input 
                             type="text" 
                             id="longitude" 
@@ -160,32 +178,32 @@
                             value="{{ old('longitude', '113.7152') }}" 
                             placeholder="113.7152" 
                             oninput="updateMapFromInputs()"
-                            class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            class="w-full px-3 py-2 rounded-[8px] bg-white border border-[#CBD5E1] text-xs font-mono font-bold text-[#0F172A] focus:outline-none focus:border-[#0F766E]"
                         />
                     </div>
                 </div>
 
-                <p id="gps-status" class="text-[11px] text-slate-500 italic">
+                <p id="gps-status" class="text-[11px] text-[#526071] italic">
                     Klik "Deteksi Lokasi Saya" untuk mendeteksi koordinat otomatis dari perangkat, atau klik/geser marker pada peta.
                 </p>
 
                 {{-- Map Preview --}}
                 <div class="mt-2">
                     <div class="flex justify-between items-center mb-1 text-[11px]">
-                        <span class="font-semibold text-slate-600">Preview Lokasi Peta (OpenStreetMap):</span>
-                        <span id="map-coords-label" class="font-mono text-slate-400 font-bold"></span>
+                        <span class="font-semibold text-[#526071]">Preview Lokasi Peta (OpenStreetMap):</span>
+                        <span id="map-coords-label" class="font-mono text-[#526071] font-bold"></span>
                     </div>
-                    <div id="map-preview" class="w-full h-56 rounded-xl border border-slate-300 overflow-hidden shadow-inner z-0"></div>
+                    <div id="map-preview" class="w-full h-56 rounded-[10px] border border-[#CBD5E1] overflow-hidden z-0"></div>
                 </div>
             </div>
 
             {{-- Pemilik Toko --}}
             <div>
-                <label for="pemilik_id" class="block text-xs font-semibold text-slate-700 mb-1">Pemilik Toko (User Terdaftar)</label>
+                <label for="pemilik_id" class="block text-xs font-semibold text-[#0F172A] mb-1.5">Pemilik Toko (User Terdaftar)</label>
                 <select 
                     id="pemilik_id" 
                     name="pemilik_id" 
-                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    class="w-full px-3.5 py-2.5 rounded-[10px] bg-white border border-[#CBD5E1] text-xs text-[#0F172A] focus:outline-none focus:border-[#0F766E] min-h-[44px]"
                 >
                     <option value="">-- Belum ada pemilik --</option>
                     @foreach($pemiliks as $p)
@@ -196,11 +214,11 @@
                 </select>
             </div>
 
-            <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">
-                <a href="{{ route('admin.toko.index') }}" class="px-4 py-2.5 border border-slate-300 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+            <div class="pt-4 border-t border-[#E2E8F0] flex justify-end gap-3">
+                <a href="{{ route('admin.toko.index') }}" class="px-4 py-2.5 border border-[#CBD5E1] rounded-[10px] text-xs font-bold text-[#334155] hover:bg-[#F3F5F8] transition min-h-[44px] flex items-center">
                     Batal
                 </a>
-                <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                <button type="submit" class="px-5 py-2.5 bg-[#0F766E] hover:bg-[#0B5C56] text-white text-xs font-bold rounded-[10px] shadow-sm transition min-h-[44px] flex items-center">
                     Simpan Toko
                 </button>
             </div>
@@ -224,13 +242,12 @@
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+            attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
         marker = L.marker([lat, lng], { draggable: true }).addTo(map);
         updateCoordsLabel(lat, lng);
 
-        // Saat marker digeser
         marker.on('dragend', function (e) {
             const coord = marker.getLatLng();
             latInput.value = coord.lat.toFixed(6);
@@ -238,7 +255,6 @@
             updateCoordsLabel(coord.lat, coord.lng);
         });
 
-        // Saat peta diklik
         map.on('click', function (e) {
             marker.setLatLng(e.latlng);
             latInput.value = e.latlng.lat.toFixed(6);
@@ -272,14 +288,14 @@
 
         if (!navigator.geolocation) {
             status.textContent = 'Geolocation tidak didukung oleh browser ini.';
-            status.className = 'text-[11px] text-rose-500 font-semibold';
+            status.className = 'text-[11px] text-[#991B1B] font-semibold';
             return;
         }
 
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mendeteksi...';
+        btn.innerHTML = 'Mendeteksi...';
         status.textContent = 'Meminta izin lokasi GPS perangkat...';
-        status.className = 'text-[11px] text-amber-600 italic font-semibold';
+        status.className = 'text-[11px] text-[#92400E] italic font-semibold';
 
         navigator.geolocation.getCurrentPosition(
             (position) => {
@@ -292,26 +308,18 @@
                 updateMapFromInputs();
 
                 status.textContent = `Lokasi GPS berhasil dideteksi! (${lat}, ${lng})`;
-                status.className = 'text-[11px] text-emerald-600 font-bold';
+                status.className = 'text-[11px] text-[#166534] font-bold';
 
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> Terdeteksi';
+                btn.innerHTML = 'Terdeteksi';
             },
             (error) => {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Coba Lagi';
+                btn.innerHTML = 'Coba Lagi';
 
                 let msg = 'Gagal mendeteksi lokasi. Pastikan izin lokasi browser diaktifkan, atau isi koordinat secara manual.';
-                if (error.code === error.PERMISSION_DENIED) {
-                    msg = 'Gagal mendeteksi lokasi. Pastikan izin lokasi browser diaktifkan, atau isi koordinat secara manual.';
-                } else if (error.code === error.POSITION_UNAVAILABLE) {
-                    msg = 'Informasi lokasi tidak tersedia pada perangkat. Silakan isi koordinat secara manual.';
-                } else if (error.code === error.TIMEOUT) {
-                    msg = 'Waktu permintaan lokasi habis. Silakan coba lagi atau isi koordinat secara manual.';
-                }
-
                 status.textContent = msg;
-                status.className = 'text-[11px] text-rose-600 font-semibold';
+                status.className = 'text-[11px] text-[#991B1B] font-semibold';
             },
             {
                 enableHighAccuracy: true,

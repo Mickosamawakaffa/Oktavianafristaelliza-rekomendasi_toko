@@ -5,28 +5,38 @@
 @section('content')
 @include('admin.partials.nav')
 
-<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
     <div class="mb-6 flex items-center justify-between">
         <div>
-            <h1 class="text-2xl font-extrabold text-slate-900">Edit Nilai Kriteria Toko</h1>
-            <p class="text-xs text-slate-500">Input/Ubah nilai kriteria (skala 1–100) untuk <strong class="text-amber-700">{{ $toko->nama }}</strong></p>
+            <h1 class="text-2xl font-extrabold text-[#0F172A]">Edit Nilai Kriteria Toko</h1>
+            <p class="text-xs sm:text-sm text-[#526071]">Input/Ubah nilai kriteria (skala 1–100) untuk <strong class="text-[#0F766E]">{{ $toko->nama }}</strong></p>
         </div>
-        <a href="{{ route('admin.nilai-alternatif.index') }}" class="text-xs text-slate-500 hover:text-slate-800 font-semibold flex items-center gap-1">
-            <i class="fa-solid fa-arrow-left"></i> Kembali
+        <a href="{{ route('admin.nilai-alternatif.index') }}" class="text-xs font-semibold text-[#526071] hover:text-[#0F172A] flex items-center gap-1.5 min-h-[44px]">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Kembali</span>
         </a>
     </div>
 
     {{-- Validation Errors --}}
     @if($errors->any())
-        <div class="mb-5 p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs space-y-1">
-            <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> Terdapat kesalahan validasi:</p>
-            @foreach($errors->all() as $error)
-                <p>- {{ $error }}</p>
-            @endforeach
+        <div class="mb-5 p-4 rounded-[12px] bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] text-xs space-y-1">
+            <p class="font-bold flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-[#DC2626] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span>Terdapat kesalahan validasi:</span>
+            </p>
+            <ul class="list-disc pl-5">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
-    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs">
+    <div class="bg-white rounded-[16px] border border-[#E2E8F0] p-6 shadow-soft">
         <form action="{{ route('admin.nilai-alternatif.update', $toko->id) }}" method="POST" class="space-y-5">
             @csrf
             @method('PUT')
@@ -34,26 +44,20 @@
             <div class="space-y-4">
                 @foreach($kriterias as $k)
                     @if($kriteriaUlasanId && $k->id === $kriteriaUlasanId)
-                        {{-- ============================================================ --}}
-                        {{-- KRITERIA ULASAN: Input rating (1-5) + jumlah ulasan + preview --}}
-                        {{-- ============================================================ --}}
-                        <div class="p-4 rounded-xl bg-indigo-50/60 border border-indigo-200/80 space-y-3">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <span class="font-bold text-sm text-slate-900 block flex items-center gap-1.5">
-                                        <i class="fa-solid fa-star text-amber-500 text-xs"></i>
-                                        {{ $k->nama_kriteria }}
-                                    </span>
-                                    <span class="text-[11px] font-semibold {{ $k->jenis === 'benefit' ? 'text-emerald-600' : 'text-rose-600' }}">
-                                        Jenis: {{ ucfirst($k->jenis) }} — Skor dihitung otomatis dari rating
-                                    </span>
-                                </div>
+                        {{-- Kriteria Ulasan --}}
+                        <div class="p-4 rounded-[12px] bg-[#E6F4F1] border border-[#0F766E]/30 space-y-3">
+                            <div>
+                                <span class="font-bold text-sm text-[#0F172A] block">
+                                    {{ $k->nama_kriteria }}
+                                </span>
+                                <span class="text-[11px] font-semibold text-[#0B5C56]">
+                                    Jenis: {{ ucfirst($k->jenis) }} — Skor dihitung otomatis dari rating
+                                </span>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                {{-- Rating Ulasan (1-5) --}}
                                 <div>
-                                    <label for="rating_ulasan" class="block text-[11px] font-semibold text-slate-600 mb-1">
+                                    <label for="rating_ulasan" class="block text-[11px] font-semibold text-[#334155] mb-1">
                                         Rating Ulasan (skala 1–5)
                                     </label>
                                     <input
@@ -66,14 +70,13 @@
                                         step="0.01"
                                         required
                                         oninput="updateSkorUlasanPreview()"
-                                        class="w-full px-3 py-2 rounded-xl border border-indigo-300 font-mono text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        class="w-full px-3 py-2 rounded-[8px] bg-white border border-[#CBD5E1] text-[#0F172A] font-bold text-center focus:outline-none focus:border-[#0F766E]"
                                         placeholder="4.30"
                                     />
                                 </div>
 
-                                {{-- Jumlah Ulasan --}}
                                 <div>
-                                    <label for="jumlah_ulasan" class="block text-[11px] font-semibold text-slate-600 mb-1">
+                                    <label for="jumlah_ulasan" class="block text-[11px] font-semibold text-[#334155] mb-1">
                                         Jumlah Ulasan
                                     </label>
                                     <input
@@ -84,22 +87,20 @@
                                         min="0"
                                         step="1"
                                         oninput="updateWarningUlasan()"
-                                        class="w-full px-3 py-2 rounded-xl border border-indigo-300 font-mono text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        class="w-full px-3 py-2 rounded-[8px] bg-white border border-[#CBD5E1] text-[#0F172A] font-bold text-center focus:outline-none focus:border-[#0F766E]"
                                         placeholder="25"
                                     />
                                 </div>
                             </div>
 
-                            {{-- Preview Skor Konversi --}}
-                            <div class="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-indigo-200">
-                                <span class="text-[11px] font-semibold text-slate-600">Skor Ulasan (1–100):</span>
-                                <span id="skor-ulasan-preview" class="font-mono font-extrabold text-lg text-indigo-700">
+                            <div class="flex items-center gap-2 p-2.5 rounded-[8px] bg-white border border-[#CBD5E1]">
+                                <span class="text-[11px] font-semibold text-[#526071]">Skor Ulasan (1–100):</span>
+                                <span id="skor-ulasan-preview" class="font-extrabold text-lg text-[#0F766E]">
                                     {{ $toko->skor_ulasan ?? '—' }}
                                 </span>
-                                <span class="text-[10px] text-slate-400 font-mono">/100</span>
+                                <span class="text-[10px] text-[#526071]">/100</span>
                             </div>
 
-                            {{-- Hidden input yang menyimpan skor konversi ke nilai[kriteria_id] --}}
                             <input
                                 type="hidden"
                                 id="nilai_ulasan_hidden"
@@ -107,27 +108,26 @@
                                 value="{{ old("nilai.{$k->id}", $nilaiMap[$k->id] ?? ($toko->skor_ulasan ?? 50)) }}"
                             />
 
-                            {{-- Warning: Jumlah ulasan kurang representatif --}}
                             <div
                                 id="warning-ulasan"
-                                class="p-3 rounded-lg bg-amber-50 border border-amber-300 text-amber-800 text-xs font-semibold flex items-center gap-2"
+                                class="p-3 rounded-[8px] bg-[#FEF3C7] border border-[#FDE68A] text-[#92400E] text-xs font-semibold flex items-center gap-2"
                                 style="display: {{ ($toko->jumlah_ulasan !== null && $toko->jumlah_ulasan < 10) ? 'flex' : 'none' }};"
                             >
-                                <i class="fa-solid fa-triangle-exclamation text-amber-500"></i>
-                                Jumlah ulasan toko ini kurang dari 10, skor ulasan mungkin kurang representatif.
+                                <svg class="w-4 h-4 text-[#92400E] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <span>Jumlah ulasan toko ini kurang dari 10, skor ulasan mungkin kurang representatif.</span>
                             </div>
                         </div>
                     @else
-                        {{-- ============================================================ --}}
-                        {{-- KRITERIA LAIN: Input manual biasa (skala 1–100) — TIDAK DIUBAH --}}
-                        {{-- ============================================================ --}}
+                        {{-- Kriteria Lain --}}
                         @php
                             $val = old("nilai.{$k->id}", $nilaiMap[$k->id] ?? 50);
                         @endphp
-                        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                        <div class="p-4 rounded-[12px] bg-[#F8FAFC] border border-[#E2E8F0] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                             <div>
-                                <span class="font-bold text-sm text-slate-900 block">{{ $k->nama_kriteria }}</span>
-                                <span class="text-[11px] font-semibold {{ $k->jenis === 'benefit' ? 'text-emerald-600' : 'text-rose-600' }}">
+                                <span class="font-bold text-sm text-[#0F172A] block">{{ $k->nama_kriteria }}</span>
+                                <span class="text-[11px] font-semibold {{ $k->jenis === 'benefit' ? 'text-[#0F766E]' : 'text-[#991B1B]' }}">
                                     Jenis: {{ ucfirst($k->jenis) }}
                                 </span>
                             </div>
@@ -141,20 +141,20 @@
                                     max="100"
                                     step="1"
                                     required
-                                    class="w-full px-3 py-2 rounded-xl border border-slate-300 font-mono text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                    class="w-full px-3 py-2 rounded-[8px] bg-white border border-[#CBD5E1] text-[#0F172A] font-bold text-center focus:outline-none focus:border-[#0F766E]"
                                 />
-                                <span class="text-xs font-semibold text-slate-400 font-mono">/100</span>
+                                <span class="text-xs font-semibold text-[#526071]">/100</span>
                             </div>
                         </div>
                     @endif
                 @endforeach
             </div>
 
-            <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">
-                <a href="{{ route('admin.nilai-alternatif.index') }}" class="px-4 py-2.5 border border-slate-300 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+            <div class="pt-4 border-t border-[#E2E8F0] flex justify-end gap-3">
+                <a href="{{ route('admin.nilai-alternatif.index') }}" class="px-4 py-2.5 border border-[#CBD5E1] rounded-[10px] text-xs font-bold text-[#334155] hover:bg-[#F3F5F8] transition min-h-[44px] flex items-center">
                     Batal
                 </a>
-                <button type="submit" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                <button type="submit" class="px-5 py-2.5 bg-[#0F766E] hover:bg-[#0B5C56] text-white text-xs font-bold rounded-[10px] shadow-sm transition min-h-[44px] flex items-center">
                     Simpan Nilai Alternatif
                 </button>
             </div>
@@ -165,19 +165,17 @@
 
 @push('scripts')
 <script>
-    /**
-     * Update preview skor ulasan dan hidden input saat rating_ulasan diubah.
-     * Rumus: skor = (rating / 5) * 100
-     */
     function updateSkorUlasanPreview() {
         const ratingInput = document.getElementById('rating_ulasan');
         const previewEl = document.getElementById('skor-ulasan-preview');
         const hiddenInput = document.getElementById('nilai_ulasan_hidden');
 
+        if (!ratingInput || !previewEl || !hiddenInput) return;
+
         const rating = parseFloat(ratingInput.value);
 
         if (!isNaN(rating) && rating >= 1 && rating <= 5) {
-            const skor = Math.round((rating / 5) * 1000) / 10; // 1 desimal
+            const skor = Math.round((rating / 5) * 1000) / 10;
             previewEl.textContent = skor;
             hiddenInput.value = skor;
         } else {
@@ -186,9 +184,6 @@
         }
     }
 
-    /**
-     * Tampilkan/sembunyikan warning jika jumlah_ulasan < 10.
-     */
     function updateWarningUlasan() {
         const jumlahInput = document.getElementById('jumlah_ulasan');
         const warningEl = document.getElementById('warning-ulasan');
@@ -204,7 +199,6 @@
         }
     }
 
-    // Jalankan saat halaman dimuat untuk set state awal yang benar
     document.addEventListener('DOMContentLoaded', function() {
         updateSkorUlasanPreview();
         updateWarningUlasan();

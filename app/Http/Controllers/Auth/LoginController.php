@@ -5,9 +5,22 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
+    /**
+     * Maximum login attempts before throttling.
+     */
+    protected int $maxAttempts = 5;
+
+    /**
+     * Throttle decay in seconds (1 minute).
+     */
+    protected int $decaySeconds = 60;
+
     /**
      * Tampilkan form login.
      */
@@ -21,18 +34,34 @@ class LoginController extends Controller
     }
 
     /**
-     * Proses autentikasi login.
+     * Proses autentikasi login dengan rate limiting.
      */
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email'],
             'password' => ['required'],
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email'    => 'Format email tidak valid.',
+            'password.required' => 'Password wajib diisi.',
         ]);
 
-        $remember = $request->has('remember');
+        // Check rate limit
+        $throttleKey = $this->throttleKey($request);
+
+        if (RateLimiter::tooManyAttempts($throttleKey, $this->maxAttempts)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+
+            throw ValidationException::withMessages([
+                'email' => "Terlalu banyak percobaan. Coba lagi dalam {$seconds} detik.",
+            ]);
+        }
+
+        $remember = $request->boolean('remember');
 
         if (Auth::attempt($credentials, $remember)) {
+            RateLimiter::clear($throttleKey);
             $request->session()->regenerate();
             $user = Auth::user();
 
@@ -40,9 +69,12 @@ class LoginController extends Controller
                 ->with('success', 'Selamat datang kembali, ' . $user->name . '!');
         }
 
-        return back()->withErrors([
-            'email' => 'Email atau password yang Anda masukkan salah.',
-        ])->onlyInput('email');
+        // Increment rate limiter on failed attempt
+        RateLimiter::hit($throttleKey, $this->decaySeconds);
+
+        throw ValidationException::withMessages([
+            'email' => 'Email atau password salah.',
+        ])->redirectTo(route('login'));
     }
 
     /**
@@ -63,14 +95,20 @@ class LoginController extends Controller
      */
     protected function redirectBasedOnRole(string $role)
     {
-        switch ($role) {
-            case 'admin':
-                return redirect()->route('admin.dashboard');
-            case 'pemilik_toko':
-                return redirect()->route('pemilik.dashboard');
-            case 'user':
-            default:
-                return redirect()->route('user.preferensi');
-        }
+        return match ($role) {
+            'admin'        => redirect()->route('admin.dashboard'),
+            'pemilik_toko' => redirect()->route('pemilik.dashboard'),
+            default        => redirect()->route('toko.index'),
+        };
+    }
+
+    /**
+     * Generate throttle key from email + IP.
+     */
+    protected function throttleKey(Request $request): string
+    {
+        return Str::transliterate(
+            Str::lower($request->input('email')) . '|' . $request->ip()
+        );
     }
 }

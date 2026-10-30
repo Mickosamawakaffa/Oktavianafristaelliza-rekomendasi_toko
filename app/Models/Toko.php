@@ -86,6 +86,32 @@ class Toko extends Model
     }
 
     /**
+     * Accessor: Cek apakah toko sedang buka berdasarkan jam_operasional saat ini (misal "09:00 - 21:00").
+     *
+     * @return bool|null
+     */
+    public function getIsBukaAttribute(): ?bool
+    {
+        if (empty($this->jam_operasional)) {
+            return null;
+        }
+
+        if (preg_match('/^(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/', trim($this->jam_operasional), $matches)) {
+            $now = now()->format('H:i');
+            $buka = str_pad($matches[1], 5, '0', STR_PAD_LEFT);
+            $tutup = str_pad($matches[2], 5, '0', STR_PAD_LEFT);
+
+            if ($buka <= $tutup) {
+                return $now >= $buka && $now <= $tutup;
+            } else {
+                return $now >= $buka || $now <= $tutup;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Relasi ke Pemilik Toko (User)
      */
     public function pemilik(): BelongsTo

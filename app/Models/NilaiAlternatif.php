@@ -19,6 +19,13 @@ class NilaiAlternatif extends Model
     ];
 
     /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'nilai' => 'double',
+    ];
+
+    /**
      * Relasi ke Toko
      */
     public function toko(): BelongsTo

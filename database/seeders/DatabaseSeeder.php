@@ -12,6 +12,15 @@ class DatabaseSeeder extends Seeder
 
     /**
      * Seed the application's database.
+     *
+     * Akun Demo (hanya untuk testing/development):
+     * ┌─────────────┬──────────────────────┬──────────┐
+     * │ Role        │ Email                │ Password │
+     * ├─────────────┼──────────────────────┼──────────┤
+     * │ Admin       │ admin@gmail.com      │ password │
+     * │ User        │ user@gmail.com       │ password │
+     * │ Pemilik     │ pemilik@toko.com     │ password │
+     * └─────────────┴──────────────────────┴──────────┘
      */
     public function run(): void
     {
@@ -31,6 +40,15 @@ class DatabaseSeeder extends Seeder
                 'name' => 'User Biasa',
                 'password' => bcrypt('password'),
                 'role' => 'user',
+            ]
+        );
+
+        User::firstOrCreate(
+            ['email' => 'pemilik@toko.com'],
+            [
+                'name' => 'Pemilik Demo',
+                'password' => bcrypt('password'),
+                'role' => 'pemilik_toko',
             ]
         );
 
