@@ -68,7 +68,7 @@
                 name="password"
                 required
                 autocomplete="current-password"
-                placeholder="Minimal 8 karakter"
+                placeholder="Masukkan password Anda"
                 class="w-full pl-11 pr-12 py-3 rounded-[10px] bg-white border border-[#CBD5E1] text-[#0F172A] placeholder-[#94A3B8] text-sm focus:outline-none focus:border-[#0F766E] focus:ring-1 focus:ring-[#0F766E] transition-all min-h-[44px]"
             />
             <button

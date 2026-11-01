@@ -3,20 +3,6 @@
 @section('title', 'Detail Toko - ' . $toko->nama)
 
 @section('content')
-{{-- Flash Message --}}
-@if(session('success'))
-    <div class="bg-[#DCFCE7] border-b border-[#BBF7D0]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <div class="flex items-center gap-2 text-[#166534] text-sm font-medium">
-                <svg class="w-5 h-5 text-[#16A34A] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{{ session('success') }}</span>
-            </div>
-        </div>
-    </div>
-@endif
-
 <!-- Breadcrumbs -->
 <div class="bg-white border-b border-[#E2E8F0]">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">

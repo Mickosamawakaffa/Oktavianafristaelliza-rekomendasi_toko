@@ -36,7 +36,7 @@ class AuthAndMiddlewareTest extends TestCase
             'password' => 'password',
         ]);
 
-        $response->assertRedirect(route('user.preferensi'));
+        $response->assertRedirect(route('toko.index'));
         $this->assertAuthenticated();
     }
 

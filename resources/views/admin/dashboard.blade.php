@@ -27,15 +27,6 @@
         </span>
     </div>
 
-    {{-- Flash Message --}}
-    @if(session('success'))
-        <div class="mb-6 p-4 rounded-[12px] bg-[#DCFCE7] border border-[#BBF7D0] text-[#166534] text-sm flex items-center gap-2">
-            <svg class="w-5 h-5 text-[#16A34A] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{{ session('success') }}</span>
-        </div>
-    @endif
 
     {{-- Stats Grid: Kartu Putih, Border #E2E8F0, Radius 16px --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
@@ -50,8 +41,8 @@
                 <span class="text-3xl font-extrabold text-[#0F172A]">{{ $stats['total_toko'] }}</span>
             </div>
             <div>
-                <p class="text-xs font-semibold text-[#526071] mb-2">Total Toko</p>
-                <div class="flex items-center gap-1.5 text-[10px] font-bold">
+                <p class="text-sm font-semibold text-[#526071] mb-2">Total Toko</p>
+                <div class="flex flex-wrap items-center gap-1.5 text-xs font-bold">
                     <span class="px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#166534]">{{ $stats['total_approved'] }} Disetujui</span>
                     @if($stats['total_pending'] > 0)
                         <span class="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E]">{{ $stats['total_pending'] }} Menunggu</span>
@@ -61,7 +52,7 @@
         </div>
 
         {{-- Total Kriteria --}}
-        <div class="bg-white rounded-[16px] border border-[#E2E8F0] p-5 shadow-soft">
+        <div class="bg-white rounded-[16px] border border-[#E2E8F0] p-5 shadow-soft flex flex-col justify-between">
             <div class="flex justify-between items-start mb-3">
                 <div class="w-10 h-10 rounded-[10px] bg-[#E6F4F1] text-[#0F766E] flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
@@ -70,11 +61,11 @@
                 </div>
                 <span class="text-3xl font-extrabold text-[#0F172A]">{{ $stats['total_kriteria'] }}</span>
             </div>
-            <p class="text-xs font-semibold text-[#526071]">Total Kriteria</p>
+            <p class="text-sm font-semibold text-[#526071]">Total Kriteria</p>
         </div>
 
         {{-- Total Pengguna --}}
-        <div class="bg-white rounded-[16px] border border-[#E2E8F0] p-5 shadow-soft">
+        <div class="bg-white rounded-[16px] border border-[#E2E8F0] p-5 shadow-soft flex flex-col justify-between">
             <div class="flex justify-between items-start mb-3">
                 <div class="w-10 h-10 rounded-[10px] bg-[#F3F5F8] text-[#334155] flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
@@ -83,11 +74,11 @@
                 </div>
                 <span class="text-3xl font-extrabold text-[#0F172A]">{{ $stats['total_user'] }}</span>
             </div>
-            <p class="text-xs font-semibold text-[#526071]">Pengguna Terdaftar</p>
+            <p class="text-sm font-semibold text-[#526071]">Pengguna Terdaftar</p>
         </div>
 
         {{-- Total Pemilik Toko --}}
-        <div class="bg-white rounded-[16px] border border-[#E2E8F0] p-5 shadow-soft">
+        <div class="bg-white rounded-[16px] border border-[#E2E8F0] p-5 shadow-soft flex flex-col justify-between">
             <div class="flex justify-between items-start mb-3">
                 <div class="w-10 h-10 rounded-[10px] bg-[#F3F5F8] text-[#334155] flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
@@ -96,7 +87,7 @@
                 </div>
                 <span class="text-3xl font-extrabold text-[#0F172A]">{{ $stats['total_pemilik'] }}</span>
             </div>
-            <p class="text-xs font-semibold text-[#526071]">Pemilik Toko</p>
+            <p class="text-sm font-semibold text-[#526071]">Pemilik Toko</p>
         </div>
     </div>
 

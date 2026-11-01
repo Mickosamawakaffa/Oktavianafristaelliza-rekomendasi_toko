@@ -26,6 +26,55 @@
         </a>
     </div>
 
+    {{-- Pilihan Terbaik (ringkasan cepat untuk pengguna) --}}
+    @php
+        $topItem = $rankings->first();
+        $topToko = $topItem['toko'] ?? null;
+    @endphp
+    @if($topToko)
+        <section aria-labelledby="judul-pilihan-terbaik" class="mb-8 rounded-card bg-hero text-white overflow-hidden shadow-teal border border-[#1a384c] relative">
+            <div class="absolute -top-24 -right-16 w-80 h-80 rounded-full bg-hero-accent/10 blur-3xl" aria-hidden="true"></div>
+            <div class="relative p-6 sm:p-8 flex flex-col md:flex-row md:items-center gap-6">
+                @if($topToko->gambar)
+                    <img src="{{ asset('storage/' . $topToko->gambar) }}" alt="Foto {{ $topToko->nama }}" class="w-full md:w-48 h-40 md:h-36 rounded-[14px] object-cover border border-white/15 shadow-soft shrink-0" />
+                @endif
+                <div class="flex-1 min-w-0">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gold-bg text-gold-text mb-3">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        Pilihan terbaik untuk Anda
+                    </span>
+                    <h2 id="judul-pilihan-terbaik" class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-1">{{ $topToko->nama }}</h2>
+                    <p class="text-sm text-[#CBD5E1] mb-4">{{ $topToko->alamat }}</p>
+
+                    <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+                        <div>
+                            <p class="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">Skor</p>
+                            <p class="text-2xl font-extrabold text-hero-accent leading-tight">{{ number_format($topItem['score'] * 100, 1, ',', '.') }}%</p>
+                        </div>
+                        @if($topItem['jarak_km'] !== null)
+                            <div>
+                                <p class="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">Jarak</p>
+                                <p class="text-2xl font-extrabold leading-tight">{{ number_format($topItem['jarak_km'], 1, ',', '.') }} <span class="text-base font-bold text-[#CBD5E1]">km</span></p>
+                            </div>
+                        @endif
+                        @if($topToko->is_buka !== null)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold {{ $topToko->is_buka ? 'bg-success-bg text-success-text' : 'bg-[#FEF2F2] text-[#991B1B]' }}">
+                                <span class="w-2 h-2 rounded-full {{ $topToko->is_buka ? 'bg-success-dot' : 'bg-[#DC2626]' }}"></span>
+                                {{ $topToko->is_buka ? 'Buka sekarang' : 'Sedang tutup' }}
+                            </span>
+                        @endif
+                    </div>
+                </div>
+                <div class="flex flex-row md:flex-col gap-3 shrink-0">
+                    <a href="{{ route('toko.show', $topToko->id) }}" class="flex-1 px-5 py-3 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-btn transition-colors text-center min-h-[44px] flex items-center justify-center shadow-sm">Lihat Detail</a>
+                    <a href="https://www.google.com/maps/dir/?api=1&origin={{ $userLat }},{{ $userLng }}&destination={{ $topToko->latitude }},{{ $topToko->longitude }}" target="_blank" rel="noopener noreferrer" class="flex-1 px-5 py-3 bg-white/10 hover:bg-white/20 text-white text-sm font-bold rounded-btn transition-colors border border-white/25 text-center min-h-[44px] flex items-center justify-center">Buka Rute</a>
+                </div>
+            </div>
+        </section>
+    @endif
+
     {{-- User GPS Banner --}}
     <div class="mb-6 p-4 rounded-[16px] bg-white border border-[#E2E8F0] shadow-soft flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div class="flex items-center gap-3">
@@ -36,7 +85,7 @@
                 </svg>
             </div>
             <div>
-                <span class="text-[11px] font-semibold text-[#526071] uppercase tracking-wider block">Titik Acuan GPS Lokasi Kamu</span>
+                <span class="text-xs font-semibold text-[#526071] uppercase tracking-wider block">Titik Acuan GPS Lokasi Kamu</span>
                 <span class="text-xs font-bold text-[#0F172A] font-mono">
                     Latitude: {{ $userLat }}, Longitude: {{ $userLng }}
                 </span>
@@ -67,12 +116,12 @@
                 @endphp
                 <div class="bg-[#F8FAFC] border border-[#E2E8F0] rounded-[12px] p-3 text-center">
                     <div class="text-xs font-bold text-[#0F766E] mb-0.5">Rank {{ $pref->urutan }}</div>
-                    <div class="text-[11px] font-semibold text-[#0F172A] mb-2 truncate" title="{{ $pref->kriteria->nama_kriteria }}">{{ $pref->kriteria->nama_kriteria }}</div>
+                    <div class="text-xs font-semibold text-[#0F172A] mb-2 truncate" title="{{ $pref->kriteria->nama_kriteria }}">{{ $pref->kriteria->nama_kriteria }}</div>
                     <div class="text-xl font-extrabold text-[#0F172A] font-mono">{{ $pct }}%</div>
                     <div class="mt-2 h-1.5 bg-[#E2E8F0] rounded-full overflow-hidden">
                         <div class="bg-[#0F766E] h-1.5 rounded-full" style="width: {{ $barWidth }}%"></div>
                     </div>
-                    <div class="mt-2 text-[10px] px-2 py-0.5 rounded-full {{ $pref->kriteria->jenis === 'benefit' ? 'bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0]' : 'bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA]' }} font-semibold inline-block">
+                    <div class="mt-2 text-xs px-2 py-0.5 rounded-full {{ $pref->kriteria->jenis === 'benefit' ? 'bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0]' : 'bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA]' }} font-semibold inline-block">
                         {{ ucfirst($pref->kriteria->jenis) }}
                     </div>
                 </div>
@@ -149,13 +198,13 @@
                     <div class="{{ $isTop1 ? 'bg-[#0E2A3B] text-white' : 'bg-[#F8FAFC] text-[#0F172A] border-b sm:border-b-0 sm:border-r border-[#E2E8F0]' }} px-6 py-5 flex flex-row sm:flex-col items-center justify-between sm:justify-center gap-4 sm:gap-2 sm:min-w-[100px] sm:text-center">
                         <div class="flex flex-col sm:block items-center gap-1">
                             <span class="text-3xl font-extrabold leading-none {{ $isTop1 ? 'text-[#5EEAD4]' : 'text-[#0F172A]' }}">#{{ $rank }}</span>
-                            <span class="text-[10px] font-semibold opacity-70 hidden sm:block">dari {{ $rankings->count() }}</span>
+                            <span class="text-xs font-semibold opacity-70 hidden sm:block">dari {{ $rankings->count() }}</span>
                         </div>
-                        <span class="text-[10px] font-bold sm:hidden px-2.5 py-0.5 rounded-full {{ $rankBadgeClass }}">{{ $rankLabel }}</span>
+                        <span class="text-xs font-bold sm:hidden px-2.5 py-0.5 rounded-full {{ $rankBadgeClass }}">{{ $rankLabel }}</span>
                         {{-- Score --}}
                         <div class="sm:mt-3 text-center">
-                            <div class="text-base font-extrabold font-mono leading-none {{ $isTop1 ? 'text-white' : 'text-[#0F766E]' }}">{{ number_format($score, 4, ',', '.') }}</div>
-                            <div class="text-[9px] font-semibold opacity-70 mt-1">Skor SMART</div>
+                            <div class="text-xl font-extrabold leading-none {{ $isTop1 ? 'text-white' : 'text-[#0F766E]' }}" title="Skor SMART: {{ number_format($score, 4, ',', '.') }}">{{ number_format($score * 100, 1, ',', '.') }}%</div>
+                            <div class="text-xs font-semibold opacity-70 mt-1">Skor</div>
                         </div>
                     </div>
 
@@ -253,7 +302,7 @@
 
                         {{-- Utility Scores Per Kriteria --}}
                         <div class="border-t border-[#E2E8F0] pt-4">
-                            <p class="text-[10px] font-bold text-[#526071] uppercase tracking-wider mb-2.5">Nilai Utility Per Kriteria</p>
+                            <p class="text-xs font-bold text-[#526071] uppercase tracking-wider mb-2.5">Nilai Per Kriteria</p>
                             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
                                 @foreach($preferensiUser as $pref)
                                     @php
@@ -262,7 +311,7 @@
                                         $utilWidth = min(100, $utilVal * 100);
                                     @endphp
                                     <div class="p-2.5 rounded-[10px] border border-[#E2E8F0] bg-[#F8FAFC]">
-                                        <p class="text-[10px] font-semibold text-[#526071] truncate mb-1" title="{{ $pref->kriteria->nama_kriteria }}">{{ $pref->kriteria->nama_kriteria }}</p>
+                                        <p class="text-xs font-semibold text-[#526071] truncate mb-1" title="{{ $pref->kriteria->nama_kriteria }}">{{ $pref->kriteria->nama_kriteria }}</p>
                                         <p class="text-[#0F766E] text-sm font-extrabold font-mono mb-1.5">{{ $utilPct }}%</p>
                                         <div class="h-1.5 bg-[#E2E8F0] rounded-full overflow-hidden">
                                             <div class="bg-[#0F766E] h-1.5 rounded-full" style="width: {{ $utilWidth }}%"></div>
