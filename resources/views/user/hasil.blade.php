@@ -500,7 +500,7 @@
                                         </td>
                                     @endforeach
                                     <td class="p-3 text-center text-[#526071]">
-                                        {{ number_format($item['jarak_km'], 2, ',', '.') }} km
+                                        {{ $item['jarak_km'] !== null ? number_format($item['jarak_km'], 2, ',', '.') . ' km' : '—' }}
                                     </td>
                                     <td class="p-3 text-center font-bold text-[#0F766E] text-sm">
                                         {{ number_format($item['score'], 6, ',', '.') }}
@@ -554,7 +554,7 @@
 
     const storesData = [
         @foreach($rankings as $idx => $item)
-            @if($item['toko'])
+            @if($item['toko'] && $item['toko']->latitude !== null && $item['toko']->longitude !== null)
             {
                 rank: {{ $idx + 1 }},
                 id: {{ $item['toko']->id }},
@@ -562,8 +562,8 @@
                 alamat: "{{ addslashes($item['toko']->alamat) }}",
                 score: "{{ number_format($item['score'], 4, ',', '.') }}",
                 jarak: "{{ number_format($item['jarak_km'], 2, ',', '.') }}",
-                lat: {{ $item['toko']->latitude ?? -8.1695 }},
-                lng: {{ $item['toko']->longitude ?? 113.7152 }}
+                lat: {{ $item['toko']->latitude }},
+                lng: {{ $item['toko']->longitude }}
             },
             @endif
         @endforeach

@@ -133,6 +133,20 @@ class Toko extends Model
     }
 
     /**
+     * Scope pencarian nama/alamat. Karakter wildcard LIKE (%, _) dari input dianggap
+     * teks biasa. Escape char '!' dipakai karena didukung semua driver (MySQL, SQLite).
+     */
+    public function scopeCari($query, string $kata)
+    {
+        $pola = '%' . str_replace(['!', '%', '_'], ['!!', '!%', '!_'], $kata) . '%';
+
+        return $query->where(function ($q) use ($pola) {
+            $q->whereRaw("nama LIKE ? ESCAPE '!'", [$pola])
+              ->orWhereRaw("alamat LIKE ? ESCAPE '!'", [$pola]);
+        });
+    }
+
+    /**
      * Cek apakah status toko sudah disetujui.
      */
     public function isApproved(): bool

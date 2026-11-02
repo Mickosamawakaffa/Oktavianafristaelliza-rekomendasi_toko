@@ -16,14 +16,21 @@ php artisan key:generate
 # 3. Migrasi database
 php artisan migrate
 
-# 4. (Opsional) Seed data demo
+# 4. Buat symlink agar foto toko yang diunggah bisa tampil
+php artisan storage:link
+
+# 5. (Opsional) Seed data demo
 php artisan db:seed
 
-# 5. Jalankan development server
+# 6. Jalankan development server
 composer dev
 # atau
 php artisan serve
 ```
+
+## Zona Waktu
+
+Status buka/tutup toko dihitung dari jam operasional memakai zona waktu aplikasi. Default-nya `Asia/Jakarta` (WIB); ubah lewat `APP_TIMEZONE` di `.env` bila perlu.
 
 ## Konfigurasi Email (untuk Reset Password)
 

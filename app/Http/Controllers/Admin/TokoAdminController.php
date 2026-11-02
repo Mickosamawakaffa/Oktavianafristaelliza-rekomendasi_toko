@@ -30,11 +30,7 @@ class TokoAdminController extends Controller
 
         // Search nama atau alamat
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('alamat', 'like', "%{$search}%");
-            });
+            $query->cari((string) $request->search);
         }
 
         $tokos = $query->latest()->paginate(10)->withQueryString();
@@ -132,6 +128,11 @@ class TokoAdminController extends Controller
             'latitude.numeric'  => 'Format latitude harus berupa angka koordinat.',
             'longitude.numeric' => 'Format longitude harus berupa angka koordinat.',
         ]);
+
+        // Status kosong tidak boleh menimpa status toko dengan null.
+        if (($validated['status'] ?? null) === null) {
+            unset($validated['status']);
+        }
 
         if ($request->hasFile('gambar')) {
             if ($toko->gambar && Storage::disk('public')->exists($toko->gambar)) {

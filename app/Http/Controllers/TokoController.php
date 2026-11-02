@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kriteria;
-use App\Models\NilaiAlternatif;
+
 use App\Models\PreferensiUser;
 use App\Models\Toko;
+use App\Services\NilaiAlternatifService;
 use App\Services\RocSmartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,9 +15,12 @@ class TokoController extends Controller
 {
     protected RocSmartService $rocSmartService;
 
-    public function __construct(RocSmartService $rocSmartService)
+    protected NilaiAlternatifService $nilaiAlternatifService;
+
+    public function __construct(RocSmartService $rocSmartService, NilaiAlternatifService $nilaiAlternatifService)
     {
         $this->rocSmartService = $rocSmartService;
+        $this->nilaiAlternatifService = $nilaiAlternatifService;
     }
 
     /**
@@ -50,7 +54,7 @@ class TokoController extends Controller
         }
 
         // Filter hanya ID kriteria yang valid
-        $orderedKriteriaIds = array_values(array_intersect($orderedKriteriaIds, $allKriteriaIds));
+        $orderedKriteriaIds = array_values(array_unique(array_intersect($orderedKriteriaIds, $allKriteriaIds)));
 
         // Tambahkan kriteria yang belum masuk ke urutan (fallback kelengkapan)
         foreach ($allKriteriaIds as $kid) {
@@ -70,11 +74,7 @@ class TokoController extends Controller
 
         // Filter pencarian berdasarkan nama atau alamat
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('alamat', 'like', "%{$search}%");
-            });
+            $query->cari((string) $request->search);
         }
 
         $tokos = $query->get();
@@ -92,6 +92,7 @@ class TokoController extends Controller
         $userLng  = session('user_lng');
 
         $alternativesValues = [];
+        $jarakToko = [];
         foreach ($tokos as $toko) {
             $alternativesValues[$toko->id] = [];
             foreach ($toko->nilaiAlternatif as $nilai) {
@@ -106,12 +107,24 @@ class TokoController extends Controller
             }
 
             if ($pakaiGps && $kriteriaLokasi && $toko->latitude !== null && $toko->longitude !== null) {
-                $alternativesValues[$toko->id][$kriteriaLokasi->id] = $this->rocSmartService->calculateHaversineDistance(
+                $jarakToko[$toko->id] = $this->rocSmartService->calculateHaversineDistance(
                     (float) $userLat,
                     (float) $userLng,
                     (float) $toko->latitude,
                     (float) $toko->longitude
                 );
+                $alternativesValues[$toko->id][$kriteriaLokasi->id] = $jarakToko[$toko->id];
+            }
+        }
+
+        // Toko tanpa koordinat dianggap sejauh toko terjauh, agar satuan km tidak tercampur
+        // dengan nilai manual 0-100 dan konsisten dengan halaman hasil.
+        if ($pakaiGps && $kriteriaLokasi && !empty($jarakToko)) {
+            $jarakTerjauh = max($jarakToko);
+            foreach ($tokos as $toko) {
+                if (!isset($jarakToko[$toko->id])) {
+                    $alternativesValues[$toko->id][$kriteriaLokasi->id] = $jarakTerjauh;
+                }
             }
         }
 
@@ -207,44 +220,7 @@ class TokoController extends Controller
 
         $toko = Toko::findOrFail($id);
 
-        // Cari ID kriteria "Ulasan" untuk sinkronisasi rating
-        $kriteriaUlasan = Kriteria::where('nama_kriteria', 'Ulasan')->first();
-        $kriteriaUlasanId = $kriteriaUlasan?->id;
-
-        $request->validate([
-            'nilai'         => ['required', 'array'],
-            'nilai.*'       => ['required', 'numeric', 'min:0', 'max:100'],
-            'rating_ulasan' => ['nullable', 'numeric', 'min:1', 'max:5'],
-            'jumlah_ulasan' => ['nullable', 'integer', 'min:0'],
-        ], [
-            'nilai.*.required' => 'Semua nilai kriteria wajib diisi.',
-            'nilai.*.numeric'  => 'Nilai kriteria harus berupa angka.',
-            'nilai.*.min'      => 'Nilai minimum adalah 0.',
-            'nilai.*.max'      => 'Nilai maksimum adalah 100.',
-            'rating_ulasan.min' => 'Rating ulasan minimum adalah 1.',
-            'rating_ulasan.max' => 'Rating ulasan maksimum adalah 5.',
-        ]);
-
-        // Simpan rating_ulasan & jumlah_ulasan ke tabel toko jika disediakan
-        if ($request->filled('rating_ulasan')) {
-            $toko->update([
-                'rating_ulasan' => (float) $request->rating_ulasan,
-                'jumlah_ulasan' => $request->jumlah_ulasan ? (int) $request->jumlah_ulasan : null,
-            ]);
-        }
-
-        foreach ($request->nilai as $kriteriaId => $val) {
-            // Untuk kriteria Ulasan: gunakan skor konversi dari rating, bukan input manual
-            // Ini memastikan nilai di nilai_alternatif selalu konsisten dengan rating_ulasan di tabel toko
-            if ($kriteriaUlasanId && (int) $kriteriaId === $kriteriaUlasanId && $request->filled('rating_ulasan')) {
-                $val = round(((float) $request->rating_ulasan / 5) * 100, 1);
-            }
-
-            NilaiAlternatif::updateOrCreate(
-                ['toko_id' => $toko->id, 'kriteria_id' => $kriteriaId],
-                ['nilai'   => (float) $val]
-            );
-        }
+        $this->nilaiAlternatifService->simpanDariRequest($request, $toko);
 
         return redirect()
             ->route('toko.show', $toko->id)

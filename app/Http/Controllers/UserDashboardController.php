@@ -88,6 +88,11 @@ class UserDashboardController extends Controller
     {
         $user = Auth::user();
 
+        $request->validate([
+            'user_lat' => ['nullable', 'numeric', 'between:-90,90'],
+            'user_lng' => ['nullable', 'numeric', 'between:-180,180'],
+        ]);
+
         // Ambil preferensi user (sudah terurut)
         $preferensiUser = PreferensiUser::where('user_id', $user->id)
             ->with('kriteria')
@@ -101,8 +106,8 @@ class UserDashboardController extends Controller
 
         // Tentukan posisi GPS User (Request param > Session > Default Alun-alun Jember)
         $gpsDefault = !$request->filled('user_lat') && !session()->has('user_lat');
-        $userLat = $request->input('user_lat', session('user_lat', -8.1724));
-        $userLng = $request->input('user_lng', session('user_lng', 113.7000));
+        $userLat = (float) $request->input('user_lat', session('user_lat', -8.1724));
+        $userLng = (float) $request->input('user_lng', session('user_lng', 113.7000));
 
         // Ambil toko yang data kriterianya sudah lengkap
         $tokos = Toko::lengkap()->with(['nilaiAlternatif.kriteria'])->get();
@@ -125,19 +130,24 @@ class UserDashboardController extends Controller
         $storeDistances = [];
         $alternativesValues = [];
 
+        // Perhitungan Haversine Formula (KM). Toko tanpa koordinat tidak diberi lokasi palsu:
+        // jaraknya null untuk tampilan, dan untuk perhitungan dianggap sejauh toko terjauh
+        // yang punya koordinat (sama seperti di beranda).
         foreach ($tokos as $toko) {
-            $tokoLat = $toko->latitude ?? -8.1695;
-            $tokoLng = $toko->longitude ?? 113.7152;
+            $storeDistances[$toko->id] = ($toko->latitude !== null && $toko->longitude !== null)
+                ? $this->rocSmartService->calculateHaversineDistance(
+                    $userLat,
+                    $userLng,
+                    (float) $toko->latitude,
+                    (float) $toko->longitude
+                )
+                : null;
+        }
 
-            // Perhitungan Haversine Formula (KM)
-            $distanceKm = $this->rocSmartService->calculateHaversineDistance(
-                $userLat,
-                $userLng,
-                $tokoLat,
-                $tokoLng
-            );
+        $jarakTerjauh = collect($storeDistances)->filter(fn ($d) => $d !== null)->max() ?? 0.0;
 
-            $storeDistances[$toko->id] = $distanceKm;
+        foreach ($tokos as $toko) {
+            $distanceKm = $storeDistances[$toko->id] ?? $jarakTerjauh;
 
             $alternativesValues[$toko->id] = [];
             foreach ($toko->nilaiAlternatif as $nilai) {
