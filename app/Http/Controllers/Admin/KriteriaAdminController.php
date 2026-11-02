@@ -9,6 +9,15 @@ use Illuminate\Http\Request;
 class KriteriaAdminController extends Controller
 {
     /**
+     * Kriteria inti yang dirujuk langsung oleh logika perhitungan (berdasarkan nama)
+     * beserta jenis yang wajib: Lokasi dihitung dari jarak GPS (cost) dan Ulasan dari
+     * Bayesian Average (benefit). Nama, jenis, dan keberadaannya tidak boleh diubah.
+     */
+    public const KRITERIA_INTI = [
+        'Lokasi' => 'cost',
+        'Ulasan' => 'benefit',
+    ];
+    /**
      * Tampilkan daftar kriteria.
      */
     public function index()
@@ -32,7 +41,7 @@ class KriteriaAdminController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_kriteria' => ['required', 'string', 'max:255', 'unique:kriteria,nama_kriteria'],
+            'nama_kriteria' => ['required', 'string', 'max:255', 'unique:kriteria,nama_kriteria', 'not_in:' . implode(',', array_keys(self::KRITERIA_INTI))],
             'jenis'         => ['required', 'in:benefit,cost'],
         ], [
             'nama_kriteria.required' => 'Nama kriteria wajib diisi.',
@@ -60,6 +69,11 @@ class KriteriaAdminController extends Controller
      */
     public function update(Request $request, Kriteria $kriterium)
     {
+        if (array_key_exists($kriterium->nama_kriteria, self::KRITERIA_INTI)) {
+            return redirect()->route('admin.kriteria.index')
+                ->with('error', "Kriteria \"{$kriterium->nama_kriteria}\" adalah kriteria inti sistem (dihitung otomatis dari GPS/ulasan) sehingga nama dan jenisnya tidak dapat diubah.");
+        }
+
         $validated = $request->validate([
             'nama_kriteria' => ['required', 'string', 'max:255', 'unique:kriteria,nama_kriteria,' . $kriterium->id],
             'jenis'         => ['required', 'in:benefit,cost'],
@@ -81,6 +95,11 @@ class KriteriaAdminController extends Controller
      */
     public function destroy(Kriteria $kriterium)
     {
+        if (array_key_exists($kriterium->nama_kriteria, self::KRITERIA_INTI)) {
+            return redirect()->route('admin.kriteria.index')
+                ->with('error', "Kriteria \"{$kriterium->nama_kriteria}\" adalah kriteria inti sistem dan tidak dapat dihapus.");
+        }
+
         $nama = $kriterium->nama_kriteria;
         $kriterium->delete();
 

@@ -45,8 +45,8 @@ class UserDashboardController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'urutan_kriteria'   => ['required', 'array'],
-            'urutan_kriteria.*' => ['required', 'integer', 'exists:kriteria,id'],
+            'urutan_kriteria'   => ['required', 'array', 'min:1'],
+            'urutan_kriteria.*' => ['required', 'integer', 'distinct', 'exists:kriteria,id'],
             'user_lat'          => ['nullable', 'numeric', 'between:-90,90'],
             'user_lng'          => ['nullable', 'numeric', 'between:-180,180'],
         ]);
@@ -100,6 +100,7 @@ class UserDashboardController extends Controller
         }
 
         // Tentukan posisi GPS User (Request param > Session > Default Alun-alun Jember)
+        $gpsDefault = !$request->filled('user_lat') && !session()->has('user_lat');
         $userLat = $request->input('user_lat', session('user_lat', -8.1724));
         $userLng = $request->input('user_lng', session('user_lng', 113.7000));
 
@@ -190,6 +191,7 @@ class UserDashboardController extends Controller
             'weights'            => $result['weights'],
             'userLat'            => $userLat,
             'userLng'            => $userLng,
+            'gpsDefault'         => $gpsDefault,
             'alternativesValues' => $alternativesValues,
         ]);
     }

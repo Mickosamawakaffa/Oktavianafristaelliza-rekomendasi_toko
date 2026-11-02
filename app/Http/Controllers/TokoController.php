@@ -83,6 +83,14 @@ class TokoController extends Controller
         $kriteriaTypes = $allKriterias->pluck('jenis', 'id')->toArray();
         $kriteriaUlasan = $allKriterias->firstWhere('nama_kriteria', 'Ulasan');
 
+        $kriteriaLokasi = $allKriterias->firstWhere('nama_kriteria', 'Lokasi');
+
+        // Jika pengguna sudah menentukan lokasi GPS (tersimpan di session lewat halaman preferensi),
+        // kriteria Lokasi dihitung dari jarak Haversine sehingga skor konsisten dengan halaman hasil.
+        $pakaiGps = session()->has('user_lat') && session()->has('user_lng');
+        $userLat  = session('user_lat');
+        $userLng  = session('user_lng');
+
         $alternativesValues = [];
         foreach ($tokos as $toko) {
             $alternativesValues[$toko->id] = [];
@@ -95,6 +103,15 @@ class TokoController extends Controller
                     }
                     $alternativesValues[$toko->id][$nilai->kriteria_id] = $val;
                 }
+            }
+
+            if ($pakaiGps && $kriteriaLokasi && $toko->latitude !== null && $toko->longitude !== null) {
+                $alternativesValues[$toko->id][$kriteriaLokasi->id] = $this->rocSmartService->calculateHaversineDistance(
+                    (float) $userLat,
+                    (float) $userLng,
+                    (float) $toko->latitude,
+                    (float) $toko->longitude
+                );
             }
         }
 
@@ -152,6 +169,7 @@ class TokoController extends Controller
             'orderedKriterias'   => $orderedKriterias,
             'orderedKriteriaIds' => $orderedKriteriaIds,
             'weights'            => $rocResult['weights'] ?? [],
+            'pakaiGps'           => $pakaiGps,
         ]);
     }
 
@@ -161,7 +179,15 @@ class TokoController extends Controller
      */
     public function show($id)
     {
-        $toko      = Toko::with(['nilaiAlternatif.kriteria', 'pemilik'])->findOrFail($id);
+        $toko = Toko::with(['nilaiAlternatif.kriteria', 'pemilik'])->findOrFail($id);
+
+        // Toko yang belum disetujui hanya boleh dilihat admin dan pemiliknya sendiri.
+        if (!$toko->isApproved()) {
+            $user = Auth::user();
+            $boleh = $user && ($user->role === 'admin' || $toko->pemilik_id === $user->id);
+            abort_unless($boleh, 404);
+        }
+
         $kriterias = Kriteria::orderBy('id')->get();
         $nilaiMap  = $toko->nilaiAlternatif->pluck('nilai', 'kriteria_id')->toArray();
 

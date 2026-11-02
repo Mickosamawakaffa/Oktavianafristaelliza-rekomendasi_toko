@@ -129,11 +129,22 @@ class PemilikDashboardController extends Controller
             $validated['gambar'] = $request->file('gambar')->store('toko', 'public');
         }
 
-        // Jika toko sebelumnya ditolak, reset status menjadi 'pending' untuk diverifikasi ulang oleh Admin
+        // Perubahan pada data identitas toko (nama, alamat, koordinat, foto) pada toko yang sudah
+        // disetujui harus diverifikasi ulang, agar verifikasi admin tidak bisa dilewati setelah approved.
+        $dataPentingBerubah = $toko->nama !== $validated['nama']
+            || $toko->alamat !== $validated['alamat']
+            || $request->hasFile('gambar')
+            || $this->koordinatBerubah($toko->latitude, $validated['latitude'] ?? null)
+            || $this->koordinatBerubah($toko->longitude, $validated['longitude'] ?? null);
+
         if ($toko->status === 'rejected') {
             $validated['status'] = 'pending';
             $validated['catatan_verifikasi'] = null;
             $pesan = 'Data toko berhasil diperbarui dan diajukan ulang untuk verifikasi Admin.';
+        } elseif ($toko->status === 'approved' && $dataPentingBerubah) {
+            $validated['status'] = 'pending';
+            $validated['catatan_verifikasi'] = null;
+            $pesan = 'Data toko diperbarui. Karena nama, alamat, lokasi, atau foto berubah, toko diajukan ulang untuk verifikasi Admin dan sementara tidak tampil di daftar publik.';
         } else {
             $pesan = 'Data toko Anda berhasil diperbarui!';
         }
@@ -164,6 +175,16 @@ class PemilikDashboardController extends Controller
 
         return redirect()->route('pemilik.dashboard')
             ->with('success', "Toko \"{$nama}\" berhasil dihapus.");
+    }
+
+    /**
+     * Bandingkan koordinat lama dan baru dengan toleransi pembulatan (6 desimal ~ 0,1 meter).
+     */
+    protected function koordinatBerubah($lama, $baru): bool
+    {
+        $normalisasi = fn ($v) => ($v === null || $v === '') ? null : round((float) $v, 6);
+
+        return $normalisasi($lama) !== $normalisasi($baru);
     }
 
     /**

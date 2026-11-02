@@ -1,0 +1,17 @@
+{
+    "name": "rekomendasi-toko-assets",
+    "private": true,
+    "description": "Build aset lokal (Tailwind v3 + pustaka JS) agar aplikasi tidak bergantung pada CDN saat demo/sidang.",
+    "scripts": {
+        "build:css": "tailwindcss -c tailwind.config.js -i input.css -o ../../public/css/app.css --minify",
+        "build:vendor": "node copy-vendor.mjs",
+        "build": "npm run build:css && npm run build:vendor"
+    },
+    "devDependencies": {
+        "@fontsource/plus-jakarta-sans": "^5.0.0",
+        "alpinejs": "^3.14.0",
+        "leaflet": "^1.9.4",
+        "sortablejs": "^1.15.2",
+        "tailwindcss": "^3.4.0"
+    }
+}

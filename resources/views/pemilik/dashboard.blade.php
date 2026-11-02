@@ -111,7 +111,7 @@
                                class="px-3.5 py-1.5 bg-[#0F766E] hover:bg-[#0B5C56] text-white text-xs font-bold rounded-[8px] transition-colors shadow-sm flex items-center gap-1.5 min-h-[36px]">
                                 <span>Edit</span>
                             </a>
-                            <form action="{{ route('pemilik.toko.destroy', $toko->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus toko {{ $toko->nama }}?')">
+                            <form action="{{ route('pemilik.toko.destroy', $toko->id) }}" method="POST" onsubmit="return confirm(@js('Apakah Anda yakin ingin menghapus toko ' . $toko->nama . '?'))">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" 

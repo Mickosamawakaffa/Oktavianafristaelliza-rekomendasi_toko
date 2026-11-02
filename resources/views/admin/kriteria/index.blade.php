@@ -43,6 +43,9 @@
                             </td>
                             <td class="py-3.5 px-4 font-bold text-[#0F172A] text-sm">
                                 {{ $k->nama_kriteria }}
+                                @if(array_key_exists($k->nama_kriteria, \App\Http\Controllers\Admin\KriteriaAdminController::KRITERIA_INTI))
+                                    <span class="ml-1.5 px-2 py-0.5 rounded-full bg-[#E6F4F1] text-[#0B5C56] font-bold text-[10px] align-middle" title="Dihitung otomatis dari GPS/ulasan. Nama dan jenis dikunci.">Kriteria inti</span>
+                                @endif
                             </td>
                             <td class="py-3.5 px-4">
                                 @if($k->jenis === 'benefit')
@@ -59,6 +62,9 @@
                                 {{ $k->nilai_alternatif_count }} nilai toko
                             </td>
                             <td class="py-3.5 px-4 text-center">
+                                @if(array_key_exists($k->nama_kriteria, \App\Http\Controllers\Admin\KriteriaAdminController::KRITERIA_INTI))
+                                    <span class="text-[11px] font-semibold text-[#526071] italic">Dikunci sistem</span>
+                                @else
                                 <div class="flex items-center justify-center gap-1.5">
                                     <a href="{{ route('admin.kriteria.edit', $k->id) }}" 
                                        class="p-2 rounded-[8px] bg-[#E6F4F1] hover:bg-[#d0ece5] text-[#0F766E] transition min-h-[32px] flex items-center justify-center" 
@@ -67,7 +73,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </a>
-                                    <form action="{{ route('admin.kriteria.destroy', $k->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus kriteria {{ $k->nama_kriteria }}?')">
+                                    <form action="{{ route('admin.kriteria.destroy', $k->id) }}" method="POST" onsubmit="return confirm(@js('Apakah Anda yakin ingin menghapus kriteria ' . $k->nama_kriteria . '?'))">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" 
@@ -79,6 +85,7 @@
                                         </button>
                                     </form>
                                 </div>
+                                @endif
                             </td>
                         </tr>
                     @empty

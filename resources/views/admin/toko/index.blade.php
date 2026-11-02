@@ -181,7 +181,7 @@
                                     @if($toko->status === 'pending' || $toko->status === 'approved')
                                         <button 
                                             type="button" 
-                                            onclick="openRejectModal({{ $toko->id }}, '{{ addslashes($toko->nama) }}')" 
+                                            onclick="openRejectModal({{ $toko->id }}, @js($toko->nama))" 
                                             class="px-2.5 py-1 rounded-[8px] bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] font-bold text-[11px] transition flex items-center gap-1 min-h-[32px]" 
                                             title="Tolak Permohonan"
                                         >

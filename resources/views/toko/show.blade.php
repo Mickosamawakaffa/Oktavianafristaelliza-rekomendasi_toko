@@ -35,9 +35,9 @@
                         <span class="px-3 py-0.5 rounded-full text-xs font-semibold bg-[#E6F4F1] text-[#0B5C56]">
                             Toko Thrift Secondhand
                         </span>
-                        @if($toko->pemilik)
+                        @if($toko->pemilik && $toko->isApproved())
                             <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/15 text-[#5EEAD4] border border-white/20">
-                                Terverifikasi Pemilik
+                                Terverifikasi Admin
                             </span>
                         @endif
                         @if($toko->is_buka !== null)

@@ -5,7 +5,7 @@
     @include('layouts.partials.head')
 
     <!-- Leaflet.js CSS for Map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ asset('vendor/leaflet/leaflet.css') }}" />
 
     <style>
         .store-grid {
@@ -263,7 +263,7 @@
     </footer>
 
     <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ asset('vendor/leaflet/leaflet.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

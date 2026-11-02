@@ -263,7 +263,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script src="{{ asset('vendor/sortable/Sortable.min.js') }}"></script>
 
 <script>
     const sortableList = document.getElementById('sortable-list');

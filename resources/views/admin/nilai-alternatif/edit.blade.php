@@ -130,6 +130,13 @@
                                 <span class="text-[11px] font-semibold {{ $k->jenis === 'benefit' ? 'text-[#0F766E]' : 'text-[#991B1B]' }}">
                                     Jenis: {{ ucfirst($k->jenis) }}
                                 </span>
+                                @if($k->nama_kriteria === 'Harga')
+                                    <span class="block text-[11px] text-[#526071] mt-0.5">Isi dengan skor tingkat harga 0–100 (bukan rupiah). Semakin tinggi = semakin mahal.</span>
+                                @elseif($k->nama_kriteria === 'Lokasi')
+                                    <span class="block text-[11px] text-[#526071] mt-0.5">Hanya cadangan untuk pengunjung tanpa GPS. Bagi pengguna yang mengatur GPS, jarak dihitung otomatis (Haversine).</span>
+                                @else
+                                    <span class="block text-[11px] text-[#526071] mt-0.5">Skor penilaian 0–100. Semakin tinggi = semakin baik.</span>
+                                @endif
                             </div>
 
                             <div class="w-full sm:w-48 flex items-center gap-2">

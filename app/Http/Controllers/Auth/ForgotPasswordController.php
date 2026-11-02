@@ -28,12 +28,12 @@ class ForgotPasswordController extends Controller
             'email.email'    => 'Format email tidak valid.',
         ]);
 
-        $status = Password::sendResetLink(
+        Password::sendResetLink(
             $request->only('email')
         );
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('status', 'Link reset password telah dikirim ke email Anda.')
-            : back()->withErrors(['email' => 'Kami tidak dapat menemukan akun dengan email tersebut.']);
+        // Pesan dibuat sama untuk email terdaftar maupun tidak, agar penyerang
+        // tidak bisa memakai form ini untuk mengecek email mana yang terdaftar.
+        return back()->with('status', 'Jika email tersebut terdaftar, link reset password telah dikirim.');
     }
 }

@@ -55,7 +55,7 @@
                         </div>
                         @if($topItem['jarak_km'] !== null)
                             <div>
-                                <p class="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">Jarak</p>
+                                <p class="text-xs font-semibold text-[#94A3B8] uppercase tracking-wider">Jarak (garis lurus)</p>
                                 <p class="text-2xl font-extrabold leading-tight">{{ number_format($topItem['jarak_km'], 1, ',', '.') }} <span class="text-base font-bold text-[#CBD5E1]">km</span></p>
                             </div>
                         @endif
@@ -89,13 +89,18 @@
                 <span class="text-xs font-bold text-[#0F172A] font-mono">
                     Latitude: {{ $userLat }}, Longitude: {{ $userLng }}
                 </span>
+                @if($gpsDefault)
+                    <span class="block text-[11px] font-semibold text-[#92400E] mt-1">Menggunakan lokasi default (pusat Kota Jember) karena GPS belum diatur. Klik "Ubah Preferensi & GPS" agar jarak sesuai posisi Anda.</span>
+                @else
+                    <span class="block text-[11px] text-[#526071] mt-1">Lokasi sesuai yang Anda atur di halaman preferensi.</span>
+                @endif
             </div>
         </div>
         <span class="text-xs px-3 py-1.5 bg-[#DCFCE7] text-[#166534] font-semibold rounded-full border border-[#BBF7D0] flex items-center gap-1.5">
             <svg class="w-4 h-4 text-[#16A34A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
             </svg>
-            <span>Jarak Dihitung via Haversine</span>
+            <span>Jarak garis lurus (Haversine)</span>
         </span>
     </div>
 
@@ -204,7 +209,7 @@
                         {{-- Score --}}
                         <div class="sm:mt-3 text-center">
                             <div class="text-xl font-extrabold leading-none {{ $isTop1 ? 'text-white' : 'text-[#0F766E]' }}" title="Skor SMART: {{ number_format($score, 4, ',', '.') }}">{{ number_format($score * 100, 1, ',', '.') }}%</div>
-                            <div class="text-xs font-semibold opacity-70 mt-1">Skor</div>
+                            <div class="text-xs font-semibold opacity-70 mt-1">Skor personal</div>
                         </div>
                     </div>
 
@@ -232,7 +237,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 </svg>
-                                                {{ number_format($distanceKm, 2, ',', '.') }} km dari Anda
+                                                {{ number_format($distanceKm, 2, ',', '.') }} km (garis lurus)
                                             </span>
                                         @endif
 
@@ -408,6 +413,13 @@
                 <p class="text-xs text-[#526071] mb-3">
                     Formula Benefit: u(a_i) = (C_i - C_min) / (C_max - C_min) | Formula Cost: u(a_i) = (C_max - C_i) / (C_max - C_min)
                 </p>
+                @php
+                    $minMax = [];
+                    foreach ($preferensiUser as $pref) {
+                        $kolom = collect($rankings)->map(fn ($r) => $r['raw_values'][$pref->kriteria_id] ?? null)->filter(fn ($v) => $v !== null);
+                        $minMax[$pref->kriteria_id] = ['min' => $kolom->min(), 'max' => $kolom->max()];
+                    }
+                @endphp
 
                 <div class="overflow-x-auto rounded-[12px] border border-[#E2E8F0] bg-white shadow-soft">
                     <table class="w-full text-left border-collapse text-xs">
@@ -418,6 +430,7 @@
                                     <th class="p-3 font-bold text-center">
                                         {{ $pref->kriteria->nama_kriteria }}
                                         <span class="block text-[10px] font-mono text-[#0F766E]">w = {{ number_format($weights[$pref->kriteria_id] ?? 0, 4, ',', '.') }}</span>
+                                        <span class="block text-[10px] font-mono font-normal text-[#526071]">min {{ number_format($minMax[$pref->kriteria_id]['min'] ?? 0, 1, ',', '.') }} | max {{ number_format($minMax[$pref->kriteria_id]['max'] ?? 0, 1, ',', '.') }}</span>
                                     </th>
                                 @endforeach
                             </tr>
@@ -457,8 +470,14 @@
                             <tr class="bg-[#F8FAFC] text-[#0F172A] border-b border-[#E2E8F0]">
                                 <th class="p-3 font-bold text-center">Rank</th>
                                 <th class="p-3 font-bold">Nama Toko</th>
+                                @foreach($preferensiUser as $pref)
+                                    <th class="p-3 font-bold text-center">
+                                        u × w
+                                        <span class="block text-[10px] font-normal text-[#526071]">{{ $pref->kriteria->nama_kriteria }}</span>
+                                    </th>
+                                @endforeach
                                 <th class="p-3 font-bold text-center">Jarak GPS</th>
-                                <th class="p-3 font-bold text-center">Total Skor Akhir</th>
+                                <th class="p-3 font-bold text-center">Total Skor Akhir (V<sub>i</sub> = Σ u × w)</th>
                                 <th class="p-3 font-bold text-center">Status Rekomendasi</th>
                             </tr>
                         </thead>
@@ -475,6 +494,11 @@
                                     <td class="p-3 font-sans font-bold text-[#0F172A]">
                                         {{ $toko?->nama }}
                                     </td>
+                                    @foreach($preferensiUser as $pref)
+                                        <td class="p-3 text-center text-[#334155]">
+                                            {{ number_format(($item['utilities'][$pref->kriteria_id] ?? 0) * ($weights[$pref->kriteria_id] ?? 0), 4, ',', '.') }}
+                                        </td>
+                                    @endforeach
                                     <td class="p-3 text-center text-[#526071]">
                                         {{ number_format($item['jarak_km'], 2, ',', '.') }} km
                                     </td>
@@ -493,8 +517,18 @@
                                 </tr>
                             @endforeach
                         </tbody>
+                        <tfoot>
+                            <tr class="bg-[#F8FAFC] border-t border-[#E2E8F0] font-mono">
+                                <td class="p-3 font-sans font-bold text-[#0F172A]" colspan="2">Σ Bobot ROC</td>
+                                @foreach($preferensiUser as $pref)
+                                    <td class="p-3 text-center font-bold text-[#0F766E]">{{ number_format($weights[$pref->kriteria_id] ?? 0, 4, ',', '.') }}</td>
+                                @endforeach
+                                <td class="p-3 text-center font-bold text-[#0F172A]" colspan="3">= {{ number_format(array_sum($weights), 4, ',', '.') }}</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
+                <p class="text-xs text-[#526071] mt-3">Bobot ROC: W<sub>k</sub> = (1/m) × Σ<sub>i=k..m</sub> (1/i). Total bobot selalu 1. Skor SMART bersifat relatif terhadap toko lain yang dibandingkan (min-max), sehingga skor 100% berarti terbaik di antara toko yang ada, bukan sempurna secara mutlak.</p>
             </div>
 
         </div>

@@ -124,6 +124,15 @@
         </div>
     @endif
 
+    <!-- Catatan cara membaca skor -->
+    <p class="mb-6 text-xs text-muted">
+        @if($pakaiGps)
+            Skor di bawah memakai jarak dari lokasi GPS yang Anda atur. Rincian langkah perhitungan ada di halaman <a href="{{ route('user.hasil') }}" class="font-bold text-primary hover:underline">Hasil Rekomendasi</a>.
+        @else
+            Skor umum ini memakai nilai kriteria Lokasi bawaan toko, belum memperhitungkan jarak dari posisi Anda. Masuk sebagai pengguna dan atur GPS untuk mendapatkan skor personal.
+        @endif
+    </p>
+
     <!-- Info hasil pencarian -->
     @if(request('search'))
         <div class="mb-6 p-4 rounded-[12px] bg-white border border-border shadow-soft flex flex-wrap items-center justify-between gap-3">
@@ -322,7 +331,7 @@
                         {{-- Skor ROC-SMART --}}
                         <div class="bg-[#F8FAFC] rounded-[12px] p-3.5 border border-border">
                             <div class="flex items-baseline justify-between mb-2">
-                                <span class="text-sm font-semibold text-muted">Skor ROC-SMART</span>
+                                <span class="text-sm font-semibold text-muted">{{ $pakaiGps ? 'Skor ROC-SMART (sesuai GPS Anda)' : 'Skor ROC-SMART umum' }}</span>
                                 <span class="text-[28px] font-extrabold text-primary leading-none">{{ number_format($toko->roc_percent, 1, ',', '.') }}%</span>
                             </div>
                             <div class="w-full bg-border rounded-full h-2 overflow-hidden" role="progressbar" aria-valuenow="{{ round($toko->roc_percent) }}" aria-valuemin="0" aria-valuemax="100" aria-label="Skor ROC-SMART {{ $toko->nama }}">

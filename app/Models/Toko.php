@@ -63,12 +63,9 @@ class Toko extends Model
         $C = 10;   // threshold kepercayaan minimum
         $m = 3.0;  // rating tengah (netral) skala 1-5
 
-        // Jika tidak ada jumlah ulasan sama sekali, gunakan formula biasa
-        if ($n === 0) {
-            return round(($this->rating_ulasan / 5) * 100, 1);
-        }
-
-        // Bayesian Average: tarik rating ke nilai tengah sebanding dengan kurangnya ulasan
+        // Bayesian Average: tarik rating ke nilai tengah sebanding dengan kurangnya ulasan.
+        // Jika n = 0 (belum ada ulasan), hasilnya otomatis sama dengan m (skor netral 60),
+        // sehingga rating tanpa jumlah ulasan tidak bisa dipakai untuk mendongkrak skor.
         $bayesianRating = ($n / ($n + $C)) * $this->rating_ulasan
                         + ($C / ($n + $C)) * $m;
 
