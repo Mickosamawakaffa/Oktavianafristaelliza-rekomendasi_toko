@@ -15,7 +15,7 @@
             </div>
             <div>
                 <h1 class="text-2xl font-extrabold text-[#0F172A] leading-tight">Hasil Rekomendasi Toko</h1>
-                <p class="text-sm text-[#526071] mt-0.5">Dihitung otomatis menggunakan metode <strong class="text-[#0F766E]">ROC + SMART + Formula Haversine (GPS)</strong></p>
+                <p class="text-sm text-[#526071] mt-0.5">Rekomendasi disesuaikan secara otomatis berdasarkan <strong class="text-[#0F766E]">urutan prioritas dan titik lokasi Anda</strong></p>
             </div>
         </div>
         <div class="flex flex-wrap items-center gap-2.5 shrink-0">
@@ -108,7 +108,7 @@
             <svg class="w-4 h-4 text-[#16A34A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
             </svg>
-            <span>Jarak garis lurus (Haversine)</span>
+            <span>Jarak dari lokasi Anda</span>
         </span>
     </div>
 
@@ -118,7 +118,7 @@
             <svg class="w-4 h-4 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
             </svg>
-            <span>Preferensi & Bobot ROC Kamu</span>
+            <span>Tingkat Prioritas Kriteria Pilihan Anda</span>
         </h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             @foreach($preferensiUser as $index => $pref)
@@ -352,9 +352,9 @@
                 </div>
                 <div>
                     <h3 class="text-base font-extrabold text-[#0F172A] flex items-center gap-2">
-                        Transparansi & Langkah-langkah Matriks Perhitungan SPK
+                        Detail Transparansi Perhitungan Sistem (Keperluan Akademik)
                     </h3>
-                    <p class="text-xs text-[#526071] mt-0.5">Klik untuk melihat pembuktian transparan rumus ROC (Bobot) + SMART (Utility) + Haversine (GPS)</p>
+                    <p class="text-xs text-[#526071] mt-0.5">Klik untuk melihat pembuktian langkah perhitungan dan matriks keputusan</p>
                 </div>
             </div>
             <svg id="icon-chevron-spk" class="w-5 h-5 text-[#526071] transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
@@ -647,7 +647,7 @@
                     </span>
                 </div>
                 <b style="font-size:13px; color:#0F172A;">${store.nama}</b><br>
-                <span style="font-size:11px; color:#526071;">Skor SMART: <strong style="color:#0F766E;">${store.score}</strong></span><br>
+                <span style="font-size:11px; color:#526071;">Skor Rekomendasi: <strong style="color:#0F766E;">${store.score}</strong></span><br>
                 <span style="font-size:11px; color:#526071;">${store.alamat}</span><br><br>
                 <a href="/toko/${store.id}"
                    style="font-size:11px; color:#0F766E; font-weight:700; text-decoration:none;">

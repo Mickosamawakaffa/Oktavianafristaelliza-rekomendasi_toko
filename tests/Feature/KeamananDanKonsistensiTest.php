@@ -233,7 +233,7 @@ class KeamananDanKonsistensiTest extends TestCase
     {
         $this->get(route('toko.index'))
             ->assertOk()
-            ->assertSee('Skor ROC-SMART umum')
+            ->assertSee('Skor Rekomendasi')
             ->assertDontSee('sesuai GPS Anda');
     }
 

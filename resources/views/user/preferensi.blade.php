@@ -14,7 +14,7 @@
         </div>
         <div>
             <h1 class="text-2xl font-extrabold text-[#0F172A] leading-tight">Preferensi Kriteria Kamu</h1>
-            <p class="text-sm text-[#526071] mt-0.5">Seret dan urutkan kriteria dari yang <strong class="text-[#0F766E]">paling penting</strong> (atas) ke <strong class="text-[#526071]">paling tidak penting</strong> (bawah). Bobot ROC dihitung otomatis dari urutan ini.</p>
+            <p class="text-sm text-[#526071] mt-0.5">Seret dan urutkan kriteria dari yang <strong class="text-[#0F766E]">paling penting</strong> (atas) ke <strong class="text-[#526071]">paling tidak penting</strong> (bawah). Pilihan teratas Anda akan menjadi prioritas utama rekomendasi toko.</p>
         </div>
     </div>
 
@@ -32,7 +32,7 @@
                         </svg>
                         <span>Posisi Lokasi Kamu Saat Ini (GPS)</span>
                     </h2>
-                    <p class="text-xs text-[#526071] mt-0.5">Jarak ke toko dihitung menggunakan formula Haversine berdasarkan posisi ini.</p>
+                    <p class="text-xs text-[#526071] mt-0.5">Jarak ke setiap toko dihitung otomatis dari koordinat ini.</p>
                 </div>
                 <button
                     type="button"
@@ -221,7 +221,7 @@
                             <svg class="w-4 h-4 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
                             </svg>
-                            <span>Preview Bobot ROC</span>
+                            <span>Tingkat Prioritas Kriteria</span>
                         </h3>
                         <p class="text-[11px] text-[#526071] mt-0.5">Diperbarui otomatis saat kamu mengubah urutan.</p>
                     </div>
@@ -232,26 +232,26 @@
                     </div>
                 </div>
 
-                {{-- Penjelasan ROC --}}
+                {{-- Penjelasan Cara Kerja --}}
                 <div class="bg-[#0E2A3B] rounded-[16px] p-5 text-white shadow-soft">
                     <h3 class="font-bold text-sm flex items-center gap-2 mb-3 text-white">
                         <svg class="w-4 h-4 text-[#5EEAD4]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span>Cara Kerja ROC + SMART + Haversine</span>
+                        <span>Bagaimana Rekomendasi Dihitung?</span>
                     </h3>
                     <div class="space-y-3 text-[11px] text-[#CBD5E1] leading-relaxed">
                         <div class="flex gap-2.5">
                             <span class="w-5 h-5 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">1</span>
-                            <p><strong class="text-white">Formula Haversine</strong> menghitung jarak riil (km) dari posisi GPS kamu ke lokasi fisik tiap toko di Jember.</p>
+                            <p><strong class="text-white">Jarak Lokasi (GPS)</strong> memperhitungkan jarak tempuh fisik dari posisi Anda ke toko di Jember.</p>
                         </div>
                         <div class="flex gap-2.5">
                             <span class="w-5 h-5 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">2</span>
-                            <p><strong class="text-white">ROC (Rank Order Centroid)</strong> menghitung persentase bobot kriteria berdasarkan ranking pilihan kamu.</p>
+                            <p><strong class="text-white">Prioritas Kriteria</strong> memberikan pengaruh terbesar pada hal yang Anda tempatkan di posisi teratas.</p>
                         </div>
                         <div class="flex gap-2.5">
                             <span class="w-5 h-5 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">3</span>
-                            <p><strong class="text-white">SMART</strong> mengurutkan toko terbaik berdasarkan kombinasi jarak GPS dan kriteria toko pilihan kamu.</p>
+                            <p><strong class="text-white">Rekomendasi Cerdas</strong> memadukan seluruh kriteria untuk menampilkan toko yang paling cocok untuk Anda.</p>
                         </div>
                     </div>
                 </div>

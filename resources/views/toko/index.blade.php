@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Daftar Toko Thrift & Rekomendasi ROC-SMART - Jember')
+@section('title', 'Daftar Toko Thrift Terbaik di Jember - Rekomendasi Pilihan')
 
 @section('content')
 @php
     $sortLabels = [
-        'rekomendasi'      => 'skor rekomendasi ROC-SMART',
+        'rekomendasi'      => 'rekomendasi terbaik',
         'rating_tertinggi' => 'rating tertinggi',
         'nama'             => 'nama A-Z',
         'terbaru'          => 'toko terbaru',
@@ -113,7 +113,7 @@
                 <svg class="w-5 h-5 text-primary shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>Prioritas kriteria kustom aktif. Skor dihitung ulang dengan ROC-SMART.</span>
+                <span>Prioritas kriteria pilihan Anda aktif. Daftar toko telah disesuaikan otomatis.</span>
             </div>
             <button type="button" onclick="openPrioritasModal()" class="text-sm font-bold text-primary hover:text-primary-dark hover:underline flex items-center gap-1 min-h-[44px]">
                 <span>Ubah prioritas</span>
@@ -127,9 +127,9 @@
     <!-- Catatan cara membaca skor -->
     <p class="mb-6 text-xs text-muted">
         @if($pakaiGps)
-            Skor di bawah memakai jarak dari lokasi GPS yang Anda atur. Rincian langkah perhitungan ada di halaman <a href="{{ route('user.hasil') }}" class="font-bold text-primary hover:underline">Hasil Rekomendasi</a>.
+            Skor di bawah memperhitungkan jarak dari lokasi GPS yang Anda atur. Rincian rekomendasi ada di halaman <a href="{{ route('user.hasil') }}" class="font-bold text-primary hover:underline">Hasil Rekomendasi</a>.
         @else
-            Skor umum ini memakai nilai kriteria Lokasi bawaan toko, belum memperhitungkan jarak dari posisi Anda. Masuk sebagai pengguna dan atur GPS untuk mendapatkan skor personal.
+            Skor rekomendasi saat ini menggunakan data toko umum. Masuk sebagai pengguna dan tentukan lokasi Anda agar rekomendasi semakin tepat dan personal.
         @endif
     </p>
 
@@ -197,7 +197,7 @@
             <div class="relative flex-1 lg:flex-none">
                 <select id="sortDropdown" onchange="handleSortChange(this.value)"
                         class="w-full lg:min-w-[250px] px-3.5 py-2.5 pr-9 rounded-btn bg-white border border-border-strong text-ink text-sm font-medium focus:outline-none focus:border-primary cursor-pointer shadow-soft appearance-none min-h-[44px]">
-                    <option value="rekomendasi" {{ ($sort ?? 'rekomendasi') === 'rekomendasi' ? 'selected' : '' }}>Skor Rekomendasi ROC-SMART</option>
+                    <option value="rekomendasi" {{ ($sort ?? 'rekomendasi') === 'rekomendasi' ? 'selected' : '' }}>Rekomendasi Terbaik</option>
                     <option value="rating_tertinggi" {{ ($sort ?? '') === 'rating_tertinggi' ? 'selected' : '' }}>Rating Tertinggi</option>
                     <option value="nama" {{ ($sort ?? '') === 'nama' ? 'selected' : '' }}>Nama A-Z</option>
                     <option value="terbaru" {{ ($sort ?? '') === 'terbaru' ? 'selected' : '' }}>Toko Terbaru</option>
@@ -328,13 +328,13 @@
                             </p>
                         </div>
 
-                        {{-- Skor ROC-SMART --}}
+                        {{-- Skor Rekomendasi --}}
                         <div class="bg-[#F8FAFC] rounded-[12px] p-3.5 border border-border">
                             <div class="flex items-baseline justify-between mb-2">
-                                <span class="text-sm font-semibold text-muted">{{ $pakaiGps ? 'Skor ROC-SMART (sesuai GPS Anda)' : 'Skor ROC-SMART umum' }}</span>
+                                <span class="text-sm font-semibold text-muted">{{ $pakaiGps ? 'Skor Rekomendasi (sesuai GPS Anda)' : 'Skor Rekomendasi' }}</span>
                                 <span class="text-[28px] font-extrabold text-primary leading-none">{{ number_format($toko->roc_percent, 1, ',', '.') }}%</span>
                             </div>
-                            <div class="w-full bg-border rounded-full h-2 overflow-hidden" role="progressbar" aria-valuenow="{{ round($toko->roc_percent) }}" aria-valuemin="0" aria-valuemax="100" aria-label="Skor ROC-SMART {{ $toko->nama }}">
+                            <div class="w-full bg-border rounded-full h-2 overflow-hidden" role="progressbar" aria-valuenow="{{ round($toko->roc_percent) }}" aria-valuemin="0" aria-valuemax="100" aria-label="Skor Rekomendasi {{ $toko->nama }}">
                                 <div class="bg-primary h-2 rounded-full transition-all duration-500" style="width: {{ min(100, max(0, $toko->roc_percent)) }}%"></div>
                             </div>
                         </div>
@@ -399,9 +399,9 @@
         </div>
         <ol class="grid grid-cols-1 md:grid-cols-3 gap-5">
             @foreach([
-                ['Tentukan prioritas', 'Urutkan kriteria dari yang paling penting. Metode ROC mengubah urutan itu menjadi bobot secara otomatis.', 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4'],
-                ['Nilai tiap toko', 'Metode SMART menilai setiap toko pada tiap kriteria, termasuk jarak dari lokasi GPS Anda.', 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
-                ['Lihat peringkat', 'Skor akhir digabungkan menjadi peringkat. Langkah perhitungannya dapat dibuka kapan saja.', 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'],
+                ['Tentukan Prioritas', 'Pilih dan urutkan hal yang paling Anda utamakan, seperti harga terjangkau atau kualitas barang.', 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4'],
+                ['Penilaian Cerdas', 'Sistem mengevaluasi toko berdasarkan koleksi pakaian, ulasan pembeli, hingga jarak dari lokasi Anda.', 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
+                ['Rekomendasi Pilihan', 'Daftar toko terbaik ditampilkan berurutan dari yang paling cocok dengan kebutuhan belanja Anda.', 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'],
             ] as $i => [$judul, $isi, $ikon])
                 <li class="bg-white rounded-card border border-border shadow-soft p-6 flex flex-col gap-4">
                     <div class="flex items-center justify-between">
