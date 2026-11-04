@@ -80,4 +80,37 @@ class UserPreferensiTest extends TestCase
             ]);
         }
     }
+
+    /**
+     * Test user can access cetak laporan page when preferensi is set.
+     */
+    public function test_user_can_access_cetak_laporan_page(): void
+    {
+        $user = User::where('role', 'user')->first();
+        $kriteriaIds = Kriteria::pluck('id')->toArray();
+
+        // Submit preferensi first
+        $this->actingAs($user)->post(route('user.preferensi.simpan'), [
+            'urutan_kriteria' => $kriteriaIds,
+            'user_lat'        => '-8.1724',
+            'user_lng'        => '113.7000',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('user.hasil.cetak'));
+        $response->assertStatus(200);
+        $response->assertSee('SISTEM PENDUKUNG KEPUTUSAN REKOMENDASI TOKO THRIFT');
+        $response->assertSee('Prioritas dan Pembobotan Kriteria (Metode ROC)');
+        $response->assertSee('Matriks Nilai Alternatif Asli (X)');
+        $response->assertSee('Matriks Nilai Utility SMART');
+        $response->assertSee('Hasil Akhir dan Peringkat Rekomendasi (V_i)');
+    }
+
+    /**
+     * Test guest cannot access cetak laporan page.
+     */
+    public function test_guest_cannot_access_cetak_laporan(): void
+    {
+        $response = $this->get(route('user.hasil.cetak'));
+        $response->assertRedirect(route('login'));
+    }
 }

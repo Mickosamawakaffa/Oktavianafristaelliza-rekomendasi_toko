@@ -86,6 +86,32 @@ class UserDashboardController extends Controller
      */
     public function hasil(Request $request)
     {
+        $data = $this->getPerhitunganData($request);
+        if ($data instanceof \Illuminate\Http\RedirectResponse) {
+            return $data;
+        }
+
+        return view('user.hasil', $data);
+    }
+
+    /**
+     * Halaman cetak dokumen laporan resmi rekomendasi SPK (Siap Cetak / Simpan PDF).
+     */
+    public function cetak(Request $request)
+    {
+        $data = $this->getPerhitunganData($request);
+        if ($data instanceof \Illuminate\Http\RedirectResponse) {
+            return $data;
+        }
+
+        return view('user.cetak', $data);
+    }
+
+    /**
+     * Helper perhitungan lengkap matriks SPK (ROC + SMART + Haversine).
+     */
+    private function getPerhitunganData(Request $request): array|\Illuminate\Http\RedirectResponse
+    {
         $user = Auth::user();
 
         $request->validate([
@@ -195,7 +221,7 @@ class UserDashboardController extends Controller
             ]);
         });
 
-        return view('user.hasil', [
+        return [
             'rankings'           => $rankings,
             'preferensiUser'     => $preferensiUser,
             'weights'            => $result['weights'],
@@ -203,6 +229,7 @@ class UserDashboardController extends Controller
             'userLng'            => $userLng,
             'gpsDefault'         => $gpsDefault,
             'alternativesValues' => $alternativesValues,
-        ]);
+            'kriteriaTypes'      => $kriteriaTypes,
+        ];
     }
 }

@@ -42,6 +42,7 @@ Route::middleware(['auth', 'role:user'])->prefix('user')->name('user.')->group(f
     Route::get('/preferensi', [UserDashboardController::class, 'preferensi'])->name('preferensi');
     Route::post('/preferensi', [UserDashboardController::class, 'simpanPreferensi'])->name('preferensi.simpan');
     Route::get('/hasil', [UserDashboardController::class, 'hasil'])->name('hasil');
+    Route::get('/hasil/cetak', [UserDashboardController::class, 'cetak'])->name('hasil.cetak');
 });
 
 // ─── Admin Dashboard & CRUD ──────────────────────────────────────────────────

@@ -18,12 +18,20 @@
                 <p class="text-sm text-[#526071] mt-0.5">Dihitung otomatis menggunakan metode <strong class="text-[#0F766E]">ROC + SMART + Formula Haversine (GPS)</strong></p>
             </div>
         </div>
-        <a href="{{ route('user.preferensi') }}" class="shrink-0 flex items-center gap-2 px-4 py-2.5 border border-[#CBD5E1] hover:border-[#0F766E] text-[#0F172A] hover:text-[#0F766E] text-xs font-bold rounded-[10px] transition bg-white hover:bg-[#E6F4F1]/30 min-h-[44px]">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-            </svg>
-            <span>Ubah Preferensi & GPS</span>
-        </a>
+        <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+            <a href="{{ route('user.hasil.cetak') }}" target="_blank" class="flex items-center gap-2 px-4 py-2.5 bg-[#0F766E] hover:bg-[#0B5C56] text-white text-xs font-bold rounded-[10px] transition shadow-soft min-h-[44px]">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                <span>Cetak Laporan SPK (PDF)</span>
+            </a>
+            <a href="{{ route('user.preferensi') }}" class="flex items-center gap-2 px-4 py-2.5 border border-[#CBD5E1] hover:border-[#0F766E] text-[#0F172A] hover:text-[#0F766E] text-xs font-bold rounded-[10px] transition bg-white hover:bg-[#E6F4F1]/30 min-h-[44px]">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+                <span>Ubah Preferensi & GPS</span>
+            </a>
+        </div>
     </div>
 
     {{-- Pilihan Terbaik (ringkasan cepat untuk pengguna) --}}
@@ -536,13 +544,21 @@
 
     {{-- CTA Bottom --}}
     <div class="mt-10 text-center py-8 border-t border-[#E2E8F0]">
-        <p class="text-sm text-[#526071] mb-4">Ingin mengubah prioritas kriteria atau titik lokasi GPS kamu?</p>
-        <a href="{{ route('user.preferensi') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-[#0F766E] hover:bg-[#0B5C56] text-white text-sm font-bold rounded-[10px] transition shadow-soft min-h-[44px]">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            <span>Atur Ulang Preferensi & GPS</span>
-        </a>
+        <p class="text-sm text-[#526071] mb-4">Ingin mencetak laporan resmi atau mengubah prioritas kriteria dan titik lokasi GPS?</p>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+            <a href="{{ route('user.hasil.cetak') }}" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-[#0F766E] hover:bg-[#0B5C56] text-white text-sm font-bold rounded-[10px] transition shadow-soft min-h-[44px]">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                <span>Cetak Laporan SPK (PDF)</span>
+            </a>
+            <a href="{{ route('user.preferensi') }}" class="inline-flex items-center gap-2 px-6 py-3 border border-[#CBD5E1] hover:border-[#0F766E] text-[#0F172A] hover:text-[#0F766E] bg-white hover:bg-[#E6F4F1]/30 text-sm font-bold rounded-[10px] transition shadow-soft min-h-[44px]">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Atur Ulang Preferensi & GPS</span>
+            </a>
+        </div>
     </div>
 </div>
 @endsection
