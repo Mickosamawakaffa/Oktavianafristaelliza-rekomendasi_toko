@@ -77,7 +77,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
 
-            {{-- LEFT: Drag-and-Drop Form (3/5) --}}
+            {{-- LEFT: Mobile-First Kriteria Form (3/5) --}}
             <div class="lg:col-span-3">
                 <div class="bg-white rounded-[16px] border border-[#E2E8F0] shadow-soft overflow-hidden">
                     <div class="px-6 py-4 border-b border-[#E2E8F0] flex justify-between items-center bg-[#F8FAFC]">
@@ -92,15 +92,77 @@
                         </span>
                     </div>
 
-                    <div class="p-6">
+                    <div class="p-5 sm:p-6">
+                        {{-- 1-Tap Presets for Mobile and Quick Selection --}}
+                        <div class="mb-5 bg-[#F8FAFC] rounded-[14px] p-4 border border-[#E2E8F0]">
+                            <div class="flex items-center justify-between mb-2.5">
+                                <span class="text-xs font-bold text-[#0F172A] flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                    Pilihan Cepat (1-Klik Tanpa Ribet)
+                                </span>
+                                <span class="text-[11px] text-[#526071]">Ketuk untuk memilih</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <button
+                                    type="button"
+                                    onclick="applyPreset('hemat', this)"
+                                    class="btn-preset px-3 py-2.5 rounded-[10px] bg-white border border-[#CBD5E1] hover:border-[#0F766E] hover:bg-[#E6F4F1]/40 text-left transition flex flex-col justify-between min-h-[56px] focus:outline-none"
+                                >
+                                    <span class="text-xs font-bold text-[#0F172A] flex items-center gap-1">
+                                        <span class="text-[#0F766E] font-black">Rp</span> Paling Hemat
+                                    </span>
+                                    <span class="text-[10px] text-[#526071] leading-tight mt-0.5">Prioritas harga murah</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onclick="applyPreset('dekat', this)"
+                                    class="btn-preset px-3 py-2.5 rounded-[10px] bg-white border border-[#CBD5E1] hover:border-[#0F766E] hover:bg-[#E6F4F1]/40 text-left transition flex flex-col justify-between min-h-[56px] focus:outline-none"
+                                >
+                                    <span class="text-xs font-bold text-[#0F172A] flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        Paling Dekat
+                                    </span>
+                                    <span class="text-[10px] text-[#526071] leading-tight mt-0.5">Prioritas jarak terdekat</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onclick="applyPreset('kualitas', this)"
+                                    class="btn-preset px-3 py-2.5 rounded-[10px] bg-white border border-[#CBD5E1] hover:border-[#0F766E] hover:bg-[#E6F4F1]/40 text-left transition flex flex-col justify-between min-h-[56px] focus:outline-none"
+                                >
+                                    <span class="text-xs font-bold text-[#0F172A] flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                                        Kualitas Terbaik
+                                    </span>
+                                    <span class="text-[10px] text-[#526071] leading-tight mt-0.5">Bahan & kondisi mantap</span>
+                                </button>
+
+                                <button
+                                    type="button"
+                                    onclick="applyPreset('populer', this)"
+                                    class="btn-preset px-3 py-2.5 rounded-[10px] bg-white border border-[#CBD5E1] hover:border-[#0F766E] hover:bg-[#E6F4F1]/40 text-left transition flex flex-col justify-between min-h-[56px] focus:outline-none"
+                                >
+                                    <span class="text-xs font-bold text-[#0F172A] flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 text-[#0F766E]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                                        Paling Populer
+                                    </span>
+                                    <span class="text-[10px] text-[#526071] leading-tight mt-0.5">Rating ulasan tertinggi</span>
+                                </button>
+                            </div>
+                        </div>
+
                         {{-- Instruction Banner --}}
                         <div class="bg-[#F8FAFC] border border-dashed border-[#CBD5E1] rounded-[12px] p-3.5 mb-5 flex items-start gap-3 text-xs text-[#526071]">
                             <svg class="w-5 h-5 text-[#0F766E] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <div>
-                                <p class="font-semibold text-[#0F172A] mb-0.5">Cara Penggunaan</p>
-                                <p>Klik dan <strong>seret baris kriteria</strong> untuk mengubah urutannya. Nomor di kiri berubah otomatis. Klik <strong>Hitung Rekomendasi</strong> untuk melihat hasil ranking toko.</p>
+                                <p class="font-semibold text-[#0F172A] mb-0.5">Cara Mengatur Kriteria di HP</p>
+                                <p>Gunakan tombol panah <strong>▲ (naik)</strong> dan <strong>▼ (turun)</strong> dengan jempol untuk memindahkan kriteria. Atau pilih salah satu <strong>Pilihan Cepat</strong> di atas. Kriteria paling atas (#1) akan menjadi faktor penentu utama rekomendasi toko.</p>
                             </div>
                         </div>
 
@@ -108,72 +170,63 @@
                         <div id="hidden-inputs"></div>
 
                         {{-- Sortable List --}}
-                        <ul id="sortable-list" class="space-y-2.5 mb-6">
+                        <ul id="sortable-list" class="space-y-3 mb-6">
                             @php
                                 $displayOrder = $preferensiSaya->isNotEmpty()
                                     ? $preferensiSaya->map(fn($p) => $p->kriteria)
                                     : $kriteria;
+
+                                $descriptions = [
+                                    'Harga' => 'Memprioritaskan pakaian murah & ramah kantong',
+                                    'Lokasi' => 'Memprioritaskan jarak toko terdekat dari lokasi Anda',
+                                    'Kualitas Produk' => 'Memprioritaskan kondisi pakaian bagus & minim minus',
+                                    'Kelengkapan Produk' => 'Memprioritaskan stok lengkap & banyak pilihan ukuran',
+                                    'Variasi Barang' => 'Memprioritaskan banyak model (jaket, hoodie, kaos, vintage)',
+                                    'Ulasan' => 'Memprioritaskan toko dengan rating & kepuasan pembeli tinggi',
+                                ];
                             @endphp
 
                             @foreach($displayOrder as $index => $k)
                                 @php
-                                    $isBenefit = $k->jenis === 'benefit';
+                                    $desc = $descriptions[$k->nama_kriteria] ?? ($k->jenis === 'cost' ? 'Nilai lebih rendah lebih diutamakan' : 'Nilai lebih tinggi lebih diutamakan');
                                 @endphp
                                 <li
                                     data-id="{{ $k->id }}"
-                                    class="sortable-item flex items-center gap-3 p-3.5 rounded-[12px] border border-[#E2E8F0] bg-white hover:border-[#0F766E] hover:bg-[#E6F4F1]/30 cursor-grab active:cursor-grabbing select-none group transition shadow-sm"
+                                    data-nama="{{ $k->nama_kriteria }}"
+                                    class="sortable-item flex items-center justify-between gap-3 p-3.5 sm:p-4 rounded-[14px] border border-[#E2E8F0] bg-white hover:border-[#0F766E]/50 hover:bg-[#F8FAFC] transition shadow-xs"
                                 >
-                                    <div class="drag-handle flex items-center gap-2.5">
-                                        <div class="rank-badge w-8 h-8 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-xs font-extrabold shrink-0 group-hover:bg-[#0B5C56] transition">
+                                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                                        <div class="rank-badge w-10 h-10 rounded-full bg-[#0F766E] text-white flex items-center justify-center text-sm font-extrabold shrink-0 shadow-xs">
                                             {{ $index + 1 }}
                                         </div>
 
-                                        <svg class="w-4 h-4 text-[#CBD5E1] group-hover:text-[#0F766E] transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8h16M4 16h16" />
-                                        </svg>
+                                        <div class="min-w-0 flex-1">
+                                            <span class="kriteria-nama text-sm sm:text-base font-bold text-[#0F172A] block leading-snug truncate">{{ $k->nama_kriteria }}</span>
+                                            <p class="text-xs text-[#526071] mt-0.5 leading-snug">{{ $desc }}</p>
+                                        </div>
                                     </div>
 
-                                    <div class="flex-1 min-w-0 drag-handle">
-                                        <span class="text-sm font-bold text-[#0F172A]">{{ $k->nama_kriteria }}</span>
-                                    </div>
-
-                                    @if($isBenefit)
-                                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] flex items-center gap-1 shrink-0">
-                                            <svg class="w-3 h-3 text-[#16A34A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                                            </svg>
-                                            Benefit
-                                        </span>
-                                    @else
-                                        <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] flex items-center gap-1 shrink-0">
-                                            <svg class="w-3 h-3 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
-                                            </svg>
-                                            Cost
-                                        </span>
-                                    @endif
-
-                                    {{-- Tombol Fallback Naik / Turun --}}
-                                    <div class="flex flex-col gap-0.5 shrink-0 pl-1 border-l border-[#E2E8F0]">
+                                    {{-- Tombol Mobile Thumb Up / Down (44x44px Touch Target) --}}
+                                    <div class="flex items-center gap-1.5 shrink-0 pl-2 border-l border-[#E2E8F0]">
                                         <button
                                             type="button"
                                             onclick="moveItemUp(this)"
-                                            class="btn-move-up w-7 h-7 rounded flex items-center justify-center text-[#526071] hover:text-[#0F766E] hover:bg-[#E6F4F1] disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:text-[#CBD5E1] transition"
+                                            class="btn-move-up w-11 h-11 rounded-[10px] bg-[#F8FAFC] hover:bg-[#E6F4F1] active:bg-[#d4ede7] border border-[#CBD5E1] text-[#0F172A] hover:text-[#0F766E] hover:border-[#0F766E]/50 disabled:opacity-20 disabled:hover:bg-[#F8FAFC] disabled:hover:text-[#CBD5E1] disabled:border-[#E2E8F0] disabled:cursor-not-allowed flex items-center justify-center transition shadow-xs focus:outline-none"
                                             title="Geser Naik"
-                                            aria-label="Geser Naik"
+                                            aria-label="Pindahkan {{ $k->nama_kriteria }} ke atas"
                                         >
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                                            <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
                                             </svg>
                                         </button>
                                         <button
                                             type="button"
                                             onclick="moveItemDown(this)"
-                                            class="btn-move-down w-7 h-7 rounded flex items-center justify-center text-[#526071] hover:text-[#0F766E] hover:bg-[#E6F4F1] disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:text-[#CBD5E1] transition"
+                                            class="btn-move-down w-11 h-11 rounded-[10px] bg-[#F8FAFC] hover:bg-[#E6F4F1] active:bg-[#d4ede7] border border-[#CBD5E1] text-[#0F172A] hover:text-[#0F766E] hover:border-[#0F766E]/50 disabled:opacity-20 disabled:hover:bg-[#F8FAFC] disabled:hover:text-[#CBD5E1] disabled:border-[#E2E8F0] disabled:cursor-not-allowed flex items-center justify-center transition shadow-xs focus:outline-none"
                                             title="Geser Turun"
-                                            aria-label="Geser Turun"
+                                            aria-label="Pindahkan {{ $k->nama_kriteria }} ke bawah"
                                         >
-                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                                            <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                             </svg>
                                         </button>
@@ -270,6 +323,41 @@
     const hiddenInputs = document.getElementById('hidden-inputs');
     const bobotPreview = document.getElementById('bobot-preview');
 
+    const presets = {
+        hemat: ['Harga', 'Kualitas Produk', 'Lokasi', 'Kelengkapan Produk', 'Variasi Barang', 'Ulasan'],
+        dekat: ['Lokasi', 'Harga', 'Kualitas Produk', 'Ulasan', 'Kelengkapan Produk', 'Variasi Barang'],
+        kualitas: ['Kualitas Produk', 'Kelengkapan Produk', 'Variasi Barang', 'Harga', 'Ulasan', 'Lokasi'],
+        populer: ['Ulasan', 'Kualitas Produk', 'Variasi Barang', 'Kelengkapan Produk', 'Harga', 'Lokasi']
+    };
+
+    function applyPreset(type, btn) {
+        const order = presets[type];
+        if (!order) return;
+
+        // Visual feedback on preset buttons
+        document.querySelectorAll('.btn-preset').forEach(b => {
+            b.classList.remove('border-[#0F766E]', 'bg-[#E6F4F1]/60', 'ring-2', 'ring-[#0F766E]/30');
+            b.classList.add('border-[#CBD5E1]', 'bg-white');
+        });
+        if (btn) {
+            btn.classList.remove('border-[#CBD5E1]', 'bg-white');
+            btn.classList.add('border-[#0F766E]', 'bg-[#E6F4F1]/60', 'ring-2', 'ring-[#0F766E]/30');
+        }
+
+        const items = Array.from(sortableList.querySelectorAll('.sortable-item'));
+        order.forEach(nama => {
+            const match = items.find(it => {
+                const elNama = it.getAttribute('data-nama') || it.querySelector('.kriteria-nama')?.textContent?.trim();
+                return elNama === nama;
+            });
+            if (match) {
+                sortableList.appendChild(match);
+            }
+        });
+
+        updateAfterSort();
+    }
+
     function calculateRocWeights(m) {
         const weights = [];
         for (let k = 1; k <= m; k++) {
@@ -312,8 +400,9 @@
             input.value = item.dataset.id;
             hiddenInputs.appendChild(input);
 
-            // Re-generate preview bobot ROC
-            const nama = item.querySelector('.min-w-0 span').textContent.trim();
+            // Re-generate preview bobot
+            const namaEl = item.querySelector('.kriteria-nama');
+            const nama = namaEl ? namaEl.textContent.trim() : (item.getAttribute('data-nama') || 'Kriteria');
             const bobot = weights[index];
             const pct = (bobot * 100).toFixed(2);
             const pctDisplay = formatNumberCommas(pct);

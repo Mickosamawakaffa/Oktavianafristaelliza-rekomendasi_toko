@@ -455,11 +455,11 @@
             </button>
         </div>
 
-        <div class="px-6 py-3 bg-primary-tint border-b border-border text-sm text-primary-dark flex items-start gap-2.5">
-            <svg class="w-4 h-4 text-primary mt-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+        <div class="px-6 py-3 bg-primary-tint border-b border-border text-xs sm:text-sm text-primary-dark flex items-start gap-2.5">
+            <svg class="w-4 h-4 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>Gunakan tombol panah untuk mengubah urutan. Kriteria di posisi #1 mendapat bobot paling besar.</span>
+            <span>Pilih salah satu <strong>Pilihan Cepat</strong> atau gunakan tombol panah untuk mengatur prioritas toko yang Anda cari.</span>
         </div>
 
         <form id="prioritasForm" action="{{ route('toko.index') }}" method="GET" class="flex flex-col flex-1 overflow-hidden">
@@ -471,44 +471,105 @@
             @endif
             <input type="hidden" name="sort" value="{{ request('sort', 'rekomendasi') }}">
 
-            <div class="p-6 space-y-2.5 overflow-y-auto flex-1 bg-white" id="kriteriaListContainer">
-                @foreach($orderedKriterias as $index => $kriteria)
-                    <div class="kriteria-item flex items-center justify-between p-3.5 rounded-[12px] bg-[#F8FAFC] border border-border hover:border-primary/50 transition-all gap-3"
-                         data-id="{{ $kriteria->id }}">
-
-                        <input type="hidden" name="kriteria_order[]" value="{{ $kriteria->id }}" class="kriteria-input-id">
-
-                        <div class="flex items-center gap-3 min-w-0">
-                            <span class="rank-badge w-9 h-9 rounded-[8px] bg-primary-tint text-primary font-bold text-sm flex items-center justify-center shrink-0">
-                                #{{ $index + 1 }}
+            <div class="p-4 sm:p-6 space-y-3 overflow-y-auto flex-1 bg-white">
+                {{-- 1-Tap Presets in Modal --}}
+                <div class="bg-[#F8FAFC] rounded-[14px] p-3.5 border border-border">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-ink flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            Pilihan Cepat 1-Klik
+                        </span>
+                        <span class="text-[10px] text-muted">Ketuk untuk atur</span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        <button type="button" onclick="applyModalPreset('hemat', this)"
+                                class="btn-modal-preset px-2.5 py-2 rounded-[8px] bg-white border border-border-strong hover:border-primary hover:bg-primary-tint text-left transition flex flex-col justify-between min-h-[50px] focus:outline-none">
+                            <span class="text-xs font-bold text-ink flex items-center gap-1">
+                                <span class="text-primary font-black">Rp</span> Paling Hemat
                             </span>
+                            <span class="text-[10px] text-muted leading-tight mt-0.5">Harga murah</span>
+                        </button>
+                        <button type="button" onclick="applyModalPreset('dekat', this)"
+                                class="btn-modal-preset px-2.5 py-2 rounded-[8px] bg-white border border-border-strong hover:border-primary hover:bg-primary-tint text-left transition flex flex-col justify-between min-h-[50px] focus:outline-none">
+                            <span class="text-xs font-bold text-ink flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                Paling Dekat
+                            </span>
+                            <span class="text-[10px] text-muted leading-tight mt-0.5">Jarak terdekat</span>
+                        </button>
+                        <button type="button" onclick="applyModalPreset('kualitas', this)"
+                                class="btn-modal-preset px-2.5 py-2 rounded-[8px] bg-white border border-border-strong hover:border-primary hover:bg-primary-tint text-left transition flex flex-col justify-between min-h-[50px] focus:outline-none">
+                            <span class="text-xs font-bold text-ink flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                                Kualitas Terbaik
+                            </span>
+                            <span class="text-[10px] text-muted leading-tight mt-0.5">Bahan terbaik</span>
+                        </button>
+                        <button type="button" onclick="applyModalPreset('populer', this)"
+                                class="btn-modal-preset px-2.5 py-2 rounded-[8px] bg-white border border-border-strong hover:border-primary hover:bg-primary-tint text-left transition flex flex-col justify-between min-h-[50px] focus:outline-none">
+                            <span class="text-xs font-bold text-ink flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                                Paling Populer
+                            </span>
+                            <span class="text-[10px] text-muted leading-tight mt-0.5">Rating ulasan</span>
+                        </button>
+                    </div>
+                </div>
 
-                            <div class="min-w-0">
-                                <span class="text-sm font-bold text-ink block truncate">{{ $kriteria->nama_kriteria }}</span>
-                                <span class="text-xs font-medium text-muted">
-                                    {{ $kriteria->jenis === 'cost' ? 'Cost: semakin kecil semakin baik' : 'Benefit: semakin besar semakin baik' }}
+                <div class="space-y-2.5" id="kriteriaListContainer">
+                    @php
+                        $modalDescriptions = [
+                            'Harga' => 'Memprioritaskan pakaian murah & ramah kantong',
+                            'Lokasi' => 'Memprioritaskan jarak toko terdekat dari lokasi Anda',
+                            'Kualitas Produk' => 'Memprioritaskan kondisi pakaian bagus & minim minus',
+                            'Kelengkapan Produk' => 'Memprioritaskan stok lengkap & banyak pilihan ukuran',
+                            'Variasi Barang' => 'Memprioritaskan variasi model baju (jaket, kaos, vintage)',
+                            'Ulasan' => 'Memprioritaskan toko dengan rating & kepuasan pembeli tinggi',
+                        ];
+                    @endphp
+
+                    @foreach($orderedKriterias as $index => $kriteria)
+                        @php
+                            $mDesc = $modalDescriptions[$kriteria->nama_kriteria] ?? ($kriteria->jenis === 'cost' ? 'Nilai lebih rendah lebih diutamakan' : 'Nilai lebih tinggi lebih diutamakan');
+                        @endphp
+                        <div class="kriteria-item flex items-center justify-between p-3.5 rounded-[12px] bg-[#F8FAFC] border border-border hover:border-primary/50 transition-all gap-3"
+                             data-id="{{ $kriteria->id }}"
+                             data-nama="{{ $kriteria->nama_kriteria }}">
+
+                            <input type="hidden" name="kriteria_order[]" value="{{ $kriteria->id }}" class="kriteria-input-id">
+
+                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                <span class="rank-badge w-10 h-10 rounded-[10px] bg-primary text-white font-extrabold text-sm flex items-center justify-center shrink-0 shadow-xs">
+                                    #{{ $index + 1 }}
                                 </span>
+
+                                <div class="min-w-0 flex-1">
+                                    <span class="kriteria-nama text-sm font-bold text-ink block truncate">{{ $kriteria->nama_kriteria }}</span>
+                                    <span class="text-xs text-muted block leading-snug mt-0.5">{{ $mDesc }}</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-1.5 shrink-0 pl-1 border-l border-border">
+                                <button type="button" onclick="moveKriteria(this, -1)"
+                                        class="btn-move-up w-11 h-11 rounded-[10px] bg-white hover:bg-primary-tint active:bg-primary-tint/80 text-ink hover:text-primary disabled:opacity-20 disabled:hover:bg-white disabled:hover:text-ink disabled:cursor-not-allowed flex items-center justify-center transition border border-border-strong shadow-xs focus:outline-none"
+                                        aria-label="Pindahkan {{ $kriteria->nama_kriteria }} ke atas">
+                                    <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+                                    </svg>
+                                </button>
+                                <button type="button" onclick="moveKriteria(this, 1)"
+                                        class="btn-move-down w-11 h-11 rounded-[10px] bg-white hover:bg-primary-tint active:bg-primary-tint/80 text-ink hover:text-primary disabled:opacity-20 disabled:hover:bg-white disabled:hover:text-ink disabled:cursor-not-allowed flex items-center justify-center transition border border-border-strong shadow-xs focus:outline-none"
+                                        aria-label="Pindahkan {{ $kriteria->nama_kriteria }} ke bawah">
+                                    <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
-
-                        <div class="flex items-center gap-1.5 shrink-0">
-                            <button type="button" onclick="moveKriteria(this, -1)"
-                                    class="btn-move-up w-10 h-10 rounded-[8px] bg-white hover:bg-primary-tint text-body hover:text-primary flex items-center justify-center transition border border-border-strong"
-                                    aria-label="Pindahkan {{ $kriteria->nama_kriteria }} ke atas">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
-                                </svg>
-                            </button>
-                            <button type="button" onclick="moveKriteria(this, 1)"
-                                    class="btn-move-down w-10 h-10 rounded-[8px] bg-white hover:bg-primary-tint text-body hover:text-primary flex items-center justify-center transition border border-border-strong"
-                                    aria-label="Pindahkan {{ $kriteria->nama_kriteria }} ke bawah">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                @endforeach
+                    @endforeach
+                </div>
             </div>
 
             <div class="px-6 py-4 bg-[#F8FAFC] border-t border-border flex flex-wrap items-center justify-between gap-3">
@@ -564,6 +625,41 @@
         if (e.key === 'Escape') closePrioritasModal();
     });
 
+    const modalPresets = {
+        hemat: ['Harga', 'Kualitas Produk', 'Lokasi', 'Kelengkapan Produk', 'Variasi Barang', 'Ulasan'],
+        dekat: ['Lokasi', 'Harga', 'Kualitas Produk', 'Ulasan', 'Kelengkapan Produk', 'Variasi Barang'],
+        kualitas: ['Kualitas Produk', 'Kelengkapan Produk', 'Variasi Barang', 'Harga', 'Ulasan', 'Lokasi'],
+        populer: ['Ulasan', 'Kualitas Produk', 'Variasi Barang', 'Kelengkapan Produk', 'Harga', 'Lokasi']
+    };
+
+    function applyModalPreset(type, btn) {
+        const order = modalPresets[type];
+        if (!order) return;
+
+        document.querySelectorAll('.btn-modal-preset').forEach(b => {
+            b.classList.remove('border-primary', 'bg-primary-tint', 'ring-2', 'ring-primary/20');
+            b.classList.add('border-border-strong', 'bg-white');
+        });
+        if (btn) {
+            btn.classList.remove('border-border-strong', 'bg-white');
+            btn.classList.add('border-primary', 'bg-primary-tint', 'ring-2', 'ring-primary/20');
+        }
+
+        const container = document.getElementById('kriteriaListContainer');
+        const items = Array.from(container.querySelectorAll('.kriteria-item'));
+        order.forEach(nama => {
+            const match = items.find(it => {
+                const elNama = it.getAttribute('data-nama') || it.querySelector('.kriteria-nama')?.textContent?.trim();
+                return elNama === nama;
+            });
+            if (match) {
+                container.appendChild(match);
+            }
+        });
+
+        updateRankBadges();
+    }
+
     function moveKriteria(btn, direction) {
         const item = btn.closest('.kriteria-item');
         const container = document.getElementById('kriteriaListContainer');
@@ -586,11 +682,16 @@
     function updateRankBadges() {
         const container = document.getElementById('kriteriaListContainer');
         const items = container.querySelectorAll('.kriteria-item');
+        const total = items.length;
         items.forEach((item, idx) => {
             const badge = item.querySelector('.rank-badge');
             if (badge) {
                 badge.textContent = '#' + (idx + 1);
             }
+            const btnUp = item.querySelector('.btn-move-up');
+            const btnDown = item.querySelector('.btn-move-down');
+            if (btnUp) btnUp.disabled = (idx === 0);
+            if (btnDown) btnDown.disabled = (idx === total - 1);
         });
     }
 
@@ -603,7 +704,13 @@
         });
 
         items.forEach(item => container.appendChild(item));
+        document.querySelectorAll('.btn-modal-preset').forEach(b => {
+            b.classList.remove('border-primary', 'bg-primary-tint', 'ring-2', 'ring-primary/20');
+            b.classList.add('border-border-strong', 'bg-white');
+        });
         updateRankBadges();
     }
+
+    document.addEventListener('DOMContentLoaded', updateRankBadges);
 </script>
 @endsection
